@@ -1,0 +1,61 @@
+{
+  "name": "redux-jet",
+  "description": "Redux middleware for node-jet ( Jet - Realtime Message Bus )",
+  "url": "https://github.com/lipp/redux-jet",
+  "keywords": [
+    "jet",
+    "node-jet",
+    "redux",
+    "middleware",
+    "realtime"
+  ],
+  "author": "Gerhard Preuss <gelipp@gmail.com>",
+  "contributors": [
+    {
+      "name": "Gerhard Preuss",
+      "email": "gelipp@gmail.com"
+    }
+  ],
+  "devDependencies": {
+    "coveralls": "2.11.6",
+    "istanbul": "0.4.2",
+    "mocha": "2.3.4",
+    "standard": "^8.0.0",
+    "standard-format": "^2.2.3"
+  },
+  "dependencies": {
+    "node-jet": "hbm/node-jet"
+  },
+  "main": "./lib",
+  "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lipp/redux-jet"
+  },
+  "license": "MIT",
+  "scripts": {
+    "test": "standard && istanbul cover _mocha -- --recursive test",
+    "test_nocover": "mocha  test"
+  },
+  "engines": {
+    "node": ">0.8.0"
+  },
+  "browserify": {
+    "transform": [
+      [
+        "babelify",
+        {
+          "presets": [
+            "es2015",
+            "stage-0"
+          ]
+        }
+      ]
+    ]
+  },
+  "homepage": "https://github.com/lipp/redux-jet",
+  "bugs": {
+    "url": "http://github.com/lipp/redux-jet/issues",
+    "email": "gelipp@gmail.com"
+  }
+}
