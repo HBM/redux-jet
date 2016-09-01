@@ -1,11 +1,14 @@
 /* globals describe it before */
 import assert from 'assert'
-import { connect } from '../lib/actions'
-import { Daemon, Peer } from 'node-jet'
+import { connect, close, set, call } from '../lib/actions'
+import { Daemon, Peer, State, Method } from 'node-jet'
+
+const url = 'ws://localhost:11123'
 
 describe('actions', () => {
   let daemon
   let peer
+
   before(() => {
     daemon = new Daemon()
     daemon.listen()
@@ -17,11 +20,11 @@ describe('actions', () => {
   describe('connect', () => {
     it('ok', (done) => {
       let i = 0
-      connect({url: 'ws://localhost:11123'})((action) => {
+      connect({url})((action) => {
         if (i === 0) {
           assert.deepEqual(action, {
             type: 'JET_CONNECT_REQUEST',
-            url: 'ws://localhost:11123',
+            url,
             password: undefined,
             user: undefined
           })
@@ -29,13 +32,20 @@ describe('actions', () => {
         } else {
           assert.deepEqual(action, {
             type: 'JET_CONNECT_SUCCESS',
-            url: 'ws://localhost:11123',
+            url,
             password: undefined,
             user: undefined
           })
           done()
         }
       })
+    })
+
+    it('twice (fast)', () => {
+      const noop = () => {}
+      close({url})
+      connect({url})(noop)
+      return connect({url})(noop)
     })
 
     it('fail', (done) => {
@@ -54,6 +64,140 @@ describe('actions', () => {
           assert.equal(type, 'JET_CONNECT_FAILURE')
           assert.equal(url, 'ws://foo.bar:11123')
           assert(error)
+          done()
+        }
+      })
+    })
+  })
+
+  it('close', (done) => {
+    connect({url})((action) => {
+      if (action.type === 'JET_CONNECT_SUCCESS') {
+        close({url})
+        done()
+      }
+    })
+    // TODO: no way to tell this was ok
+  })
+
+  describe('set', () => {
+    let state
+    let onSet
+
+    before(() => {
+      state = new State('abc')
+      state.on('set', (val) => {
+        return onSet(val)
+      })
+      return peer.add(state)
+    })
+
+    it('ok', (done) => {
+      let i = 0
+      let newVal
+      onSet = (val) => {
+        newVal = val
+      }
+
+      set({url}, 'abc', 123)((action) => {
+        if (i === 0) {
+          const {path, value, id, type} = action
+          assert.equal(type, 'JET_SET_REQUEST')
+          assert.equal(path, 'abc')
+          assert.equal(value, 123)
+          assert(id)
+          ++i
+        } else {
+          const {path, value, id, type} = action
+          assert.equal(type, 'JET_SET_SUCCESS')
+          assert.equal(path, 'abc')
+          assert.equal(value, 123)
+          assert(id)
+          assert.equal(newVal, 123)
+          done()
+        }
+      })
+    })
+
+    it('fail', (done) => {
+      let i = 0
+      set({url}, 'abc2', 123)((action) => {
+        if (i === 0) {
+          const {path, value, id, type} = action
+          assert.equal(type, 'JET_SET_REQUEST')
+          assert.equal(path, 'abc2')
+          assert.equal(value, 123)
+          assert(id)
+          ++i
+        } else {
+          const {path, id, type, error} = action
+          assert.equal(type, 'JET_SET_FAILURE')
+          assert.equal(path, 'abc2')
+          assert(error)
+          assert(id)
+          done()
+        }
+      })
+    })
+  })
+
+  describe('call', () => {
+    let method
+    let onCall
+
+    before(() => {
+      method = new Method('def')
+      method.on('call', (args) => {
+        return onCall(args)
+      })
+      return peer.add(method)
+    })
+
+    it('ok', (done) => {
+      let i = 0
+      let args
+      onCall = (_args) => {
+        args = _args
+        return args[0] + args[1]
+      }
+
+      call({url}, 'def', [1, 2])((action) => {
+        console.log(action)
+        if (i === 0) {
+          const {path, args, id, type} = action
+          assert.equal(type, 'JET_CALL_REQUEST')
+          assert.equal(path, 'def')
+          assert.deepEqual(args, [1, 2])
+          assert(id)
+          ++i
+        } else {
+          const {path, result, id, type} = action
+          assert.equal(type, 'JET_CALL_SUCCESS')
+          assert.equal(path, 'def')
+          assert.equal(result, 3)
+          assert(id)
+          assert.deepEqual(args, [1, 2])
+          done()
+        }
+      })
+    })
+
+    it('fail', (done) => {
+      let i = 0
+      call({url}, 'abc2', [1, 2])((action) => {
+        if (i === 0) {
+          const {path, args, id, type} = action
+          assert.equal(type, 'JET_CALL_REQUEST')
+          assert.equal(path, 'abc2')
+          assert.deepEqual(args, [1, 2])
+          assert(id)
+          ++i
+        } else {
+          const {path, id, type, error} = action
+          assert.equal(type, 'JET_CALL_FAILURE')
+          assert.equal(path, 'abc2')
+          assert(error)
+          assert(id)
           done()
         }
       })
