@@ -1,9 +1,20 @@
 /* globals describe it */
 import assert from 'assert'
-import { requests, request } from '../lib/reducers'
+import { requests, request, sorted, unsorted } from '../lib/reducers'
 
 describe('reducers', () => {
   describe('request (internal helper)', () => {
+    it('unknown action type does nothing', () => {
+      const action = {
+        type: 'JET_NOT_YET_IMPLEMENTED',
+        path: 'foo',
+        value: 123,
+        id: 'bar'
+      }
+      const req = request(123, action)
+      assert.equal(req, 123)
+    })
+
     it('JET_SET_REQUEST', () => {
       const action = {
         type: 'JET_SET_REQUEST',
@@ -231,6 +242,114 @@ describe('reducers', () => {
       assert.equal(path, 'foo')
       assert.equal(value, 123)
       assert.equal(pending, false)
+    })
+  })
+
+  describe('sorted', () => {
+    it('default is empty array', () => {
+      assert.deepEqual(sorted('foo')(undefined, {}), [])
+    })
+
+    it('returns empty array for JET_FETCHER_FAILURE', () => {
+      const action = {
+        type: 'JET_FETCHER_FAILURE',
+        id: 'foo'
+      }
+      assert.deepEqual(sorted('foo')(undefined, action), [])
+    })
+
+    it('returns empty array for JET_FETCHER_REQUEST', () => {
+      const action = {
+        type: 'JET_FETCHER_REQUEST',
+        id: 'foo'
+      }
+      assert.deepEqual(sorted('foo')(undefined, action), [])
+    })
+
+    it('returns array with data from JET_FETCHER_CONTENT_CHANGE', () => {
+      const action = {
+        type: 'JET_FETCHER_CONTENT_CHANGE',
+        data: [1, 2, 3],
+        id: 'foo'
+      }
+      const state = sorted('foo')([4], action)
+      assert.deepEqual(state, [1, 2, 3])
+    })
+
+    it('returns unmodified state if same id but unknown action.type', () => {
+      const action = {
+        type: 'JET_NOT_YET_IMPLEMENTED',
+        id: 'foo'
+      }
+      const state = sorted('foo')([4, 2], action)
+      assert.deepEqual(state, [4, 2])
+    })
+  })
+
+  describe('unsorted', () => {
+    it('default is empty object', () => {
+      assert.deepEqual(unsorted('foo')(undefined, {}), {})
+    })
+
+    it('returns empty object for JET_FETCHER_FAILURE', () => {
+      const action = {
+        type: 'JET_FETCHER_FAILURE',
+        id: 'foo'
+      }
+      assert.deepEqual(unsorted('foo')(undefined, action), {})
+    })
+
+    it('returns empty object for JET_FETCHER_REQUEST', () => {
+      const action = {
+        type: 'JET_FETCHER_REQUEST',
+        id: 'foo'
+      }
+      assert.deepEqual(unsorted('foo')(undefined, action), {})
+    })
+
+    it('returns object with data from JET_FETCHER_CONTENT_CHANGE / add event', () => {
+      const action = {
+        type: 'JET_FETCHER_CONTENT_CHANGE',
+        path: 'bla',
+        value: 123,
+        event: 'add',
+        id: 'foo'
+      }
+      const state = unsorted('foo')(undefined, action)
+      assert.deepEqual(state, {bla: 123})
+    })
+
+    it('returns object with data from JET_FETCHER_CONTENT_CHANGE / change event', () => {
+      const action = {
+        type: 'JET_FETCHER_CONTENT_CHANGE',
+        path: 'bla',
+        value: 123,
+        event: 'change',
+        id: 'foo'
+      }
+      const state = unsorted('foo')(undefined, action)
+      assert.deepEqual(state, {bla: 123})
+    })
+
+    it('returns object with data from JET_FETCHER_CONTENT_CHANGE / remove event', () => {
+      const action = {
+        type: 'JET_FETCHER_CONTENT_CHANGE',
+        path: 'bla',
+        value: 123,
+        event: 'remove',
+        id: 'foo'
+      }
+      const state = unsorted('foo')({bla: 123}, action)
+      assert.deepEqual(state, {})
+    })
+
+    it('returns unmodified state if same id but unknown action.type', () => {
+      const action = {
+        type: 'JET_NOT_YET_IMPLEMENTED',
+        id: 'foo'
+      }
+      const state = unsorted('foo')({foo: 123}, action)
+      assert.deepEqual(state, {foo: 123})
     })
   })
 })
