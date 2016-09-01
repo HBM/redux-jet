@@ -266,9 +266,9 @@ describe('reducers', () => {
       assert.deepEqual(sorted('foo')(undefined, action), [])
     })
 
-    it('returns array with data from JET_FETCHER_CONTENT_CHANGE', () => {
+    it('returns array with data from JET_FETCHER_DATA', () => {
       const action = {
-        type: 'JET_FETCHER_CONTENT_CHANGE',
+        type: 'JET_FETCHER_DATA',
         data: [1, 2, 3],
         id: 'foo'
       }
@@ -307,36 +307,42 @@ describe('reducers', () => {
       assert.deepEqual(unsorted('foo')(undefined, action), {})
     })
 
-    it('returns object with data from JET_FETCHER_CONTENT_CHANGE / add event', () => {
+    it('returns object with data from JET_FETCHER_DATA / add event', () => {
       const action = {
-        type: 'JET_FETCHER_CONTENT_CHANGE',
-        path: 'bla',
-        value: 123,
-        event: 'add',
+        type: 'JET_FETCHER_DATA',
+        data: {
+          path: 'bla',
+          value: 123,
+          event: 'add'
+        },
         id: 'foo'
       }
       const state = unsorted('foo')(undefined, action)
       assert.deepEqual(state, {bla: 123})
     })
 
-    it('returns object with data from JET_FETCHER_CONTENT_CHANGE / change event', () => {
+    it('returns object with data from JET_FETCHER_DATA / change event', () => {
       const action = {
-        type: 'JET_FETCHER_CONTENT_CHANGE',
-        path: 'bla',
-        value: 123,
-        event: 'change',
+        type: 'JET_FETCHER_DATA',
+        data: {
+          path: 'bla',
+          value: 123,
+          event: 'change'
+        },
         id: 'foo'
       }
       const state = unsorted('foo')(undefined, action)
       assert.deepEqual(state, {bla: 123})
     })
 
-    it('returns object with data from JET_FETCHER_CONTENT_CHANGE / remove event', () => {
+    it('returns object with data from JET_FETCHER_DATA / remove event', () => {
       const action = {
-        type: 'JET_FETCHER_CONTENT_CHANGE',
-        path: 'bla',
-        value: 123,
-        event: 'remove',
+        type: 'JET_FETCHER_DATA',
+        data: {
+          path: 'bla',
+          value: 123,
+          event: 'remove'
+        },
         id: 'foo'
       }
       const state = unsorted('foo')({bla: 123}, action)
