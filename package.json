@@ -56,6 +56,11 @@
       ]
     ]
   },
+  "browser": {
+    "ws": false,
+    "bluebird": false,
+    "node-jet": "node_modules/node-jet/lib/browser.js"
+  },
   "homepage": "https://github.com/lipp/redux-jet",
   "bugs": {
     "url": "http://github.com/lipp/redux-jet/issues",
