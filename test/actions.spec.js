@@ -218,7 +218,7 @@ describe('actions', () => {
           equals: 'ppp'
         }
       }
-      fetch({url}, fexpression , 'someid')((action) => {
+      fetch({url}, fexpression, 'someid')((action) => {
         if (i === 0) {
           const {expression, id, type} = action
           assert.equal(type, 'JET_FETCHER_REQUEST')
