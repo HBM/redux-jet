@@ -1,6 +1,6 @@
 /* globals describe it before */
 import assert from 'assert'
-import { connect, close, set, call } from '../lib/actions'
+import { connect, close, set, call, fetch } from '../lib/actions'
 import { Daemon, Peer, State, Method } from 'node-jet'
 
 const url = 'ws://localhost:11123'
@@ -162,7 +162,6 @@ describe('actions', () => {
       }
 
       call({url}, 'def', [1, 2])((action) => {
-        console.log(action)
         if (i === 0) {
           const {path, args, id, type} = action
           assert.equal(type, 'JET_CALL_REQUEST')
@@ -198,6 +197,48 @@ describe('actions', () => {
           assert.equal(path, 'abc2')
           assert(error)
           assert(id)
+          done()
+        }
+      })
+    })
+  })
+
+  describe('fetch', () => {
+    let state
+
+    before(() => {
+      state = new State('ppp', 444)
+      return peer.add(state)
+    })
+
+    it('ok', (done) => {
+      let i = 0
+      const fexpression = {
+        path: {
+          equals: 'ppp'
+        }
+      }
+      fetch({url}, fexpression , 'someid')((action) => {
+        if (i === 0) {
+          const {expression, id, type} = action
+          assert.equal(type, 'JET_FETCHER_REQUEST')
+          assert.deepEqual(expression, fexpression)
+          assert.equal(id, 'someid')
+          ++i
+        } else if (i === 1) {
+          const {expression, id, type} = action
+          assert.equal(type, 'JET_FETCHER_SUCCESS')
+          assert.deepEqual(expression, fexpression)
+          assert.equal(id, 'someid')
+          ++i
+        } else {
+          console.log(action)
+          assert.equal(action.type, 'JET_FETCHER_CONTENT_CHANGE')
+          assert.deepEqual(action.expression.path, fexpression.path)
+          assert.equal(action.event, 'add')
+          assert.equal(action.path, 'ppp')
+          assert.equal(action.value, 444)
+          assert.equal(action.id, 'someid')
           done()
         }
       })
