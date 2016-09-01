@@ -1,6 +1,6 @@
 /* globals describe it before */
 import assert from 'assert'
-import { connect, close, set, call, fetch } from '../lib/actions'
+import { connect, close, set, call, fetch, unfetch } from '../lib/actions'
 import { Daemon, Peer, State, Method } from 'node-jet'
 
 const url = 'ws://localhost:11123'
@@ -70,13 +70,18 @@ describe('actions', () => {
     })
   })
 
-  it('close', (done) => {
+  it('connect -> close', (done) => {
     connect({url})((action) => {
       if (action.type === 'JET_CONNECT_SUCCESS') {
         close({url})
         done()
       }
     })
+    // TODO: no way to tell this was ok
+  })
+
+  it('close', () => {
+    close({url: 'ws://localhost.bar:123'})
     // TODO: no way to tell this was ok
   })
 
@@ -232,16 +237,87 @@ describe('actions', () => {
           assert.equal(id, 'someid')
           ++i
         } else {
-          console.log(action)
-          assert.equal(action.type, 'JET_FETCHER_CONTENT_CHANGE')
+          assert.equal(action.type, 'JET_FETCHER_DATA')
           assert.deepEqual(action.expression.path, fexpression.path)
-          assert.equal(action.event, 'add')
-          assert.equal(action.path, 'ppp')
-          assert.equal(action.value, 444)
+          assert.equal(action.data.event, 'add')
+          assert.equal(action.data.path, 'ppp')
+          assert.equal(action.data.value, 444)
           assert.equal(action.id, 'someid')
           done()
         }
       })
     })
+
+    it('change fetcher', (done) => {
+      let i = 0
+      const fexpression = {
+        path: {
+          equals: 'ppp'
+        }
+      }
+      fetch({url}, {path: {equals: '33'}}, 'someid')(() => {})
+      fetch({url}, fexpression, 'someid')((action) => {
+        if (i === 0) {
+          const {expression, id, type} = action
+          assert.equal(type, 'JET_FETCHER_REQUEST')
+          assert.deepEqual(expression, fexpression)
+          assert.equal(id, 'someid')
+          ++i
+        } else if (i === 1) {
+          const {expression, id, type} = action
+          assert.equal(type, 'JET_FETCHER_SUCCESS')
+          assert.deepEqual(expression, fexpression)
+          assert.equal(id, 'someid')
+          ++i
+        } else {
+          assert.equal(action.type, 'JET_FETCHER_DATA')
+          assert.deepEqual(action.expression.path, fexpression.path)
+          assert.equal(action.data.event, 'add')
+          assert.equal(action.data.path, 'ppp')
+          assert.equal(action.data.value, 444)
+          assert.equal(action.id, 'someid')
+          done()
+        }
+      })
+    })
+
+    it('fail', (done) => {
+      let i = 0
+      fetch({url}, 1, 'someid')((action) => {
+        if (i === 0) {
+          const {expression, id, type} = action
+          assert.equal(type, 'JET_FETCHER_REQUEST')
+          assert.equal(expression, 1)
+          assert.equal(id, 'someid')
+          ++i
+        } else if (i === 1) {
+          const {expression, id, type, error} = action
+          assert.equal(type, 'JET_FETCHER_FAILURE')
+          assert.equal(expression, 1)
+          assert.equal(id, 'someid')
+          assert(error)
+          done()
+        }
+      })
+    })
+  })
+
+  it('fetch -> unfetch', (done) => {
+    fetch({url}, {path: {equals: '33'}}, 'someid')((action) => {
+      if (action.type === 'JET_FETCHER_SUCCESS') {
+        const action = unfetch({url}, 'someid')
+        assert.equal(action.url, url)
+        assert.equal(action.type, 'JET_UNFETCH')
+        assert.equal(action.id, 'someid')
+        done()
+      }
+    })
+  })
+
+  it('unfetch', () => {
+    const action = unfetch({url}, 'someid')
+    assert.equal(action.url, url)
+    assert.equal(action.type, 'JET_UNFETCH')
+    assert.equal(action.id, 'someid')
   })
 })
