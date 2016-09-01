@@ -23,7 +23,8 @@
     "babel-preset-stage-0": "^6.5.0",
     "coveralls": "^2.11.12",
     "istanbul": "^1.0.0-alpha.2",
-    "mocha": "^3.0.2"
+    "mocha": "^3.0.2",
+    "standard": "^8.0.0"
   },
   "dependencies": {
     "node-jet": "lipp/node-jet",
@@ -37,8 +38,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "test": "istanbul cover _mocha -- --compilers js:babel-core/register",
-    "test_nocover": "mocha  test"
+    "test": "standard && istanbul cover _mocha -- --compilers js:babel-core/register"
   },
   "engines": {
     "node": ">0.8.0"
