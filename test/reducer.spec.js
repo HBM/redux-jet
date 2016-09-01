@@ -1,0 +1,236 @@
+/* globals describe it */
+import assert from 'assert'
+import { requests, request } from '../lib/reducers'
+
+describe('reducers', () => {
+  describe('request (internal helper)', () => {
+    it('JET_SET_REQUEST', () => {
+      const action = {
+        type: 'JET_SET_REQUEST',
+        path: 'foo',
+        value: 123,
+        id: 'bar'
+      }
+      const req = request(undefined, action)
+      assert.equal(req.path, 'foo')
+      assert.equal(req.value, 123)
+      assert.equal(req.pending, true)
+      assert.equal(req.id, 'bar')
+    })
+
+    it('JET_CALL_REQUEST', () => {
+      const action = {
+        type: 'JET_CALL_REQUEST',
+        path: 'foo',
+        args: [1, 2],
+        id: 'bar'
+      }
+      const req = request(undefined, action)
+      assert.equal(req.path, 'foo')
+      assert.deepEqual(req.args, [1, 2])
+      assert.equal(req.pending, true)
+      assert.equal(req.id, 'bar')
+    })
+
+    it('JET_SET_SUCCESS', () => {
+      const prev = {
+        path: 'foo',
+        value: 123,
+        id: 'bar',
+        pending: true
+      }
+      const action = {
+        type: 'JET_SET_SUCCESS',
+        id: 'bar'
+      }
+      const req = request(prev, action)
+      assert.equal(req.path, 'foo')
+      assert.equal(req.value, 123)
+      assert.equal(req.pending, false)
+      assert.equal(req.id, 'bar')
+    })
+
+    it('JET_CALL_SUCCESS', () => {
+      const prev = {
+        path: 'foo',
+        args: [1, 2],
+        id: 'bar',
+        pending: true
+      }
+      const action = {
+        type: 'JET_CALL_SUCCESS',
+        id: 'bar',
+        result: 123
+      }
+      const req = request(prev, action)
+      assert.equal(req.path, 'foo')
+      assert.equal(req.result, 123)
+      assert.equal(req.pending, false)
+      assert.equal(req.id, 'bar')
+      assert.deepEqual(req.args, [1, 2])
+    })
+
+    it('JET_SET_FAILURE', () => {
+      const prev = {
+        path: 'foo',
+        value: 123,
+        id: 'bar',
+        pending: true
+      }
+      const action = {
+        type: 'JET_SET_FAILURE',
+        error: 'arg',
+        id: 'bar'
+      }
+      const req = request(prev, action)
+      assert.equal(req.path, 'foo')
+      assert.equal(req.value, 123)
+      assert.equal(req.pending, false)
+      assert.equal(req.id, 'bar')
+      assert.equal(req.error, 'arg')
+    })
+
+    it('JET_CALL_FAILURE', () => {
+      const prev = {
+        path: 'foo',
+        args: [1, 2],
+        id: 'bar',
+        pending: true
+      }
+      const action = {
+        type: 'JET_CALL_FAILURE',
+        error: 'arg',
+        id: 'bar'
+      }
+      const req = request(prev, action)
+      assert.equal(req.path, 'foo')
+      assert.deepEqual(req.args, [1, 2])
+      assert.equal(req.pending, false)
+      assert.equal(req.id, 'bar')
+      assert.equal(req.error, 'arg')
+    })
+
+    it('JET_CALL_SUCCESS other id', () => {
+      const prev = {
+        path: 'foo',
+        args: [1, 2],
+        id: 'bar',
+        pending: true
+      }
+      const action = {
+        type: 'JET_CALL_SUCCESS',
+        id: 'bar2',
+        result: 123
+      }
+      const req = request(prev, action)
+      assert.equal(req, prev)
+    })
+
+    it('JET_CALL_SUCCESS other id', () => {
+      const prev = {
+        path: 'foo',
+        args: [1, 2],
+        id: 'bar',
+        pending: true
+      }
+      const action = {
+        type: 'JET_CALL_SUCCESS',
+        id: 'bar2',
+        result: 123
+      }
+      const req = request(prev, action)
+      assert.equal(req, prev)
+    })
+
+    it('JET_SET_FAILURE other id', () => {
+      const prev = {
+        path: 'foo',
+        value: 123,
+        id: 'bar',
+        pending: true
+      }
+      const action = {
+        type: 'JET_SET_FAILURE',
+        error: 'arg',
+        id: 'bar2'
+      }
+      const req = request(prev, action)
+      assert.equal(req, prev)
+    })
+
+    it('JET_CALL_FAILURE other id', () => {
+      const prev = {
+        path: 'foo',
+        args: [1, 2],
+        id: 'bar',
+        pending: true
+      }
+      const action = {
+        type: 'JET_CALL_FAILURE',
+        error: 'arg',
+        id: 'bar2'
+      }
+      const req = request(prev, action)
+      assert.equal(req, prev)
+    })
+  })
+
+  describe('requests', () => {
+    it('defaults to empty array', () => {
+      const req = requests()
+      assert.deepEqual(req(undefined, {}), [])
+    })
+
+    it('push request', () => {
+      const req = requests()
+      const action = {
+        type: 'JET_SET_REQUEST',
+        path: 'foo',
+        value: 123
+      }
+      const state = req([{foo: 'bar'}], action)
+      assert.equal(state.length, 2)
+      assert.deepEqual(state[0], {foo: 'bar'})
+      const {path, value, pending} = state[1]
+      assert.equal(path, 'foo')
+      assert.equal(value, 123)
+      assert.equal(pending, true)
+    })
+
+    it('push request pops old prev requests', () => {
+      const req = requests(2)
+      const action = {
+        type: 'JET_SET_REQUEST',
+        path: 'foo',
+        value: 123
+      }
+      const state = req([{foo: 'bar'}, {bla: 'foo'}], action)
+      assert.equal(state.length, 2)
+      assert.deepEqual(state[0], {bla: 'foo'})
+      const {path, value, pending} = state[1]
+      assert.equal(path, 'foo')
+      assert.equal(value, 123)
+      assert.equal(pending, true)
+    })
+
+    it('modifies existing request', () => {
+      const req = requests()
+      const action = {
+        type: 'JET_SET_SUCCESS',
+        id: 'bar'
+      }
+      const prev = [{
+        id: 'bar',
+        pending: true,
+        value: 123,
+        path: 'foo'
+      }]
+      const state = req(prev, action)
+      assert.equal(state.length, 1)
+      const {path, value, pending} = state[0]
+      assert.equal(path, 'foo')
+      assert.equal(value, 123)
+      assert.equal(pending, false)
+    })
+  })
+})
