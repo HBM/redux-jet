@@ -300,6 +300,47 @@ describe('actions', () => {
         }
       })
     })
+
+    it('sorted', (done) => {
+      let i = 0
+      const expression = {
+        path: {
+          startsWith: 'ppp'
+        },
+        sort: {
+          byPath: true,
+          from: 1,
+          to: 10
+        }
+      }
+      const s2 = new State('ppp2', 3)
+      peer.add(s2).then(() => {
+        fetch({url}, expression, 'someid')((action) => {
+          if (i === 0) {
+            ++i
+          } else if (i === 1) {
+            assert.equal(action.type, 'JET_FETCHER_DATA')
+            const expected = [
+              { path: 'ppp', value: 444, fetchOnly: true, index: 1 },
+              { path: 'ppp2', value: 3, fetchOnly: true, index: 2 }
+            ]
+            assert.deepEqual(action.data, expected)
+            s2.value(6666)
+            ++i
+          } else if (i === 2) {
+            assert.equal(action.type, 'JET_FETCHER_DATA')
+            const expected = [
+              { path: 'ppp', value: 444, fetchOnly: true, index: 1 },
+              { path: 'ppp2', value: 6666, fetchOnly: true, index: 2 }
+            ]
+            assert.deepEqual(action.data, expected)
+            s2.remove().then(() => {
+              done()
+            })
+          }
+        })
+      })
+    })
   })
 
   it('fetch -> unfetch', (done) => {
