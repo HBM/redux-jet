@@ -445,24 +445,24 @@ describe('reducers', () => {
   })
 
   describe('single', () => {
-    it('default is undefined', () => {
-      assert.equal(single('foo')(undefined, {}), undefined)
+    it('default is null', () => {
+      assert.equal(single('foo')(undefined, {}), null)
     })
 
-    it('returns undefined for JET_FETCHER_FAILURE', () => {
+    it('returns null for JET_FETCHER_FAILURE', () => {
       const action = {
         type: 'JET_FETCHER_FAILURE',
         id: 'foo'
       }
-      assert.equal(single('foo')(undefined, action), undefined)
+      assert.equal(single('foo')(undefined, action), null)
     })
 
-    it('returns undefined for JET_FETCHER_REQUEST', () => {
+    it('returns null for JET_FETCHER_REQUEST', () => {
       const action = {
         type: 'JET_FETCHER_REQUEST',
         id: 'foo'
       }
-      assert.equal(single('foo')(undefined, action), undefined)
+      assert.equal(single('foo')(undefined, action), null)
     })
 
     it('returns object with data.value from JET_FETCHER_DATA / add event', () => {
@@ -493,7 +493,7 @@ describe('reducers', () => {
       assert.equal(state, 123)
     })
 
-    it('returns undefined from JET_FETCHER_DATA / remove event', () => {
+    it('returns null from JET_FETCHER_DATA / remove event', () => {
       const action = {
         type: 'JET_FETCHER_DATA',
         data: {
@@ -504,7 +504,7 @@ describe('reducers', () => {
         id: 'foo'
       }
       const state = single('foo')(undefined, action)
-      assert.equal(state, undefined)
+      assert.equal(state, null)
     })
 
     it('returns unmodified state if same id but unknown action.type', () => {
