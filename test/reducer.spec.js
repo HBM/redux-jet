@@ -1,6 +1,6 @@
 /* globals describe it */
 import assert from 'assert'
-import { requests, request, sorted, unsorted, array, single } from '../lib/reducers'
+import { requests, request, sorted, unsorted, array, single, messages } from '../lib/reducers'
 
 describe('reducers', () => {
   describe('request (internal helper)', () => {
@@ -441,6 +441,57 @@ describe('reducers', () => {
       }
       const state = unsorted('foo')({foo: 123}, action)
       assert.deepEqual(state, {foo: 123})
+    })
+  })
+
+  describe('messages', () => {
+    it('default is []', () => {
+      assert.deepEqual(messages(3)(undefined, {}), [])
+    })
+
+    it('prepends JET_DEBUG actions', () => {
+      const action1 = {
+        type: 'JET_DEBUG',
+        x: 123
+      }
+      const action2 = {
+        type: 'JET_DEBUG',
+        x: 333
+      }
+      const reducer = messages(3)
+      const state = reducer(reducer(undefined, action1), action2)
+      assert.deepEqual(state, [action2, action1])
+    })
+
+    it('maxLength defaults to 1000', () => {
+      let i = 0
+      let state
+      const reducer = messages()
+      for (i = 0; i < 1000; ++i) {
+        state = reducer(state, {type: 'JET_DEBUG'})
+        assert(state.length <= 1000)
+      }
+      assert.equal(state.length, 1000)
+      state = reducer(state, {type: 'JET_DEBUG'})
+      assert.equal(state.length, 1000)
+    })
+
+    it('discards old JET_DEBUG actions', () => {
+      const action1 = {
+        type: 'JET_DEBUG',
+        x: 123
+      }
+      const action2 = {
+        type: 'JET_DEBUG',
+        x: 333
+      }
+      const action3 = {
+        type: 'JET_DEBUG',
+        x: 444
+      }
+      const reducer = messages(2)
+      const state = reducer(reducer(reducer(undefined, action1), action2), action3)
+      assert.deepEqual(state, [action3, action2])
     })
   })
 
