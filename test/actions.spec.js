@@ -1,4 +1,4 @@
-/* globals describe it before */
+/* globals describe it before afterEach */
 import assert from 'assert'
 import { connect, close, set, call, fetch, unfetch } from '../lib/actions'
 import { Daemon, Peer, State, Method } from 'node-jet'
@@ -18,6 +18,10 @@ describe('actions', () => {
   })
 
   describe('connect', () => {
+    afterEach(() => {
+      close({url})
+    })
+
     it('ok', (done) => {
       let i = 0
       connect({url})((action) => {
@@ -36,6 +40,28 @@ describe('actions', () => {
             password: undefined,
             user: undefined
           })
+          done()
+        }
+      })
+    })
+
+    it('with debug', (done) => {
+      let i = 0
+      connect({url}, true)((action) => {
+        if (action.type !== 'JET_DEBUG') {
+          return
+        }
+        if (i === 0) {
+          assert.equal(action.direction, 'out')
+          assert.equal(typeof action.string, 'string')
+          assert.doesNotThrow(() => new Date(action.timestamp))
+          assert.equal(typeof action.json, 'object')
+          ++i
+        } else if (i === 1) {
+          assert.equal(action.direction, 'in')
+          assert.equal(typeof action.string, 'string')
+          assert.doesNotThrow(() => new Date(action.timestamp))
+          assert.equal(typeof action.json, 'object')
           done()
         }
       })
