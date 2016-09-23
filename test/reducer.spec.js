@@ -391,6 +391,39 @@ describe('reducers', () => {
       assert.deepEqual(state, [expected])
     })
 
+    it('JET_SET_FAILURE sets result', () => {
+      const action = {
+        type: 'JET_SET_FAILURE',
+        path: 'asd',
+        value: 321,
+        id: 3,
+        error: 'arg'
+      }
+      const initial = {
+        path: 'asd',
+        value: 123,
+        index: 1,
+        request: {
+          value: 321,
+          pending: true,
+          id: 3
+        }
+      }
+      const expected = {
+        path: 'asd',
+        value: 123,
+        index: 1,
+        request: {
+          pending: false,
+          value: 321,
+          error: 'arg',
+          id: 3
+        }
+      }
+      const state = sorted('foo')([initial], action)
+      assert.deepEqual(state, [expected])
+    })
+
     it('returns unmodified state if same id but unknown action.type', () => {
       const action = {
         type: 'JET_NOT_YET_IMPLEMENTED',
@@ -420,6 +453,27 @@ describe('reducers', () => {
         id: 'foo'
       }
       assert.deepEqual(array('foo')(undefined, action), [])
+    })
+
+    it('adds request data with data from JET_SET_REQUEST', () => {
+      const action = {
+        type: 'JET_SET_REQUEST',
+        path: 'asd',
+        value: 3334,
+        id: 3
+      }
+      const state = array('foo')([{path: 'asd', value: 123, index: 1}], action)
+      const expected = {
+        path: 'asd',
+        value: 123,
+        index: 1,
+        request: {
+          pending: true,
+          value: 3334,
+          id: 3
+        }
+      }
+      assert.deepEqual(state, [expected])
     })
 
     it('returns array with data from JET_FETCHER_DATA (data is sorted) new element', () => {
@@ -539,6 +593,27 @@ describe('reducers', () => {
         id: 'foo'
       }
       assert.deepEqual(unsorted('foo')(undefined, action), {})
+    })
+
+    it('adds request data with data from JET_SET_REQUEST', () => {
+      const action = {
+        type: 'JET_SET_REQUEST',
+        path: 'asd',
+        value: 3334,
+        id: 3
+      }
+      const state = unsorted('foo')({asd: {value: 123}}, action)
+      const expected = {
+        asd: {
+          value: 123,
+          request: {
+            pending: true,
+            value: 3334,
+            id: 3
+          }
+        }
+      }
+      assert.deepEqual(state, expected)
     })
 
     it('returns object with data from JET_FETCHER_DATA / add event', () => {
