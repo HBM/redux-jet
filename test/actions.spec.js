@@ -265,9 +265,9 @@ describe('actions', () => {
         } else {
           assert.equal(action.type, 'JET_FETCHER_DATA')
           assert.deepEqual(action.expression.path, fexpression.path)
-          assert.equal(action.data.event, 'add')
-          assert.equal(action.data.path, 'ppp')
-          assert.equal(action.data.value, 444)
+          assert.equal(action.data[0].event, 'add')
+          assert.equal(action.data[0].path, 'ppp')
+          assert.equal(action.data[0].value, 444)
           assert.equal(action.id, 'someid')
           done()
         }
@@ -298,9 +298,9 @@ describe('actions', () => {
         } else {
           assert.equal(action.type, 'JET_FETCHER_DATA')
           assert.deepEqual(action.expression.path, fexpression.path)
-          assert.equal(action.data.event, 'add')
-          assert.equal(action.data.path, 'ppp')
-          assert.equal(action.data.value, 444)
+          assert.equal(action.data[0].event, 'add')
+          assert.equal(action.data[0].path, 'ppp')
+          assert.equal(action.data[0].value, 444)
           assert.equal(action.id, 'someid')
           done()
         }
@@ -347,8 +347,11 @@ describe('actions', () => {
           } else if (i === 1) {
             assert.equal(action.type, 'JET_FETCHER_DATA')
             const expected = [
-              { path: 'ppp', value: 444, fetchOnly: true, index: 1 },
-              { path: 'ppp2', value: 3, fetchOnly: true, index: 2 }
+              [
+                { path: 'ppp', value: 444, fetchOnly: true, index: 1 },
+                { path: 'ppp2', value: 3, fetchOnly: true, index: 2 }
+              ],
+              2
             ]
             assert.deepEqual(action.data, expected)
             s2.value(6666)
@@ -356,8 +359,10 @@ describe('actions', () => {
           } else if (i === 2) {
             assert.equal(action.type, 'JET_FETCHER_DATA')
             const expected = [
-              { path: 'ppp', value: 444, fetchOnly: true, index: 1 },
-              { path: 'ppp2', value: 6666, fetchOnly: true, index: 2 }
+              [
+                { path: 'ppp2', value: 6666, fetchOnly: true, index: 2 }
+              ],
+              2
             ]
             assert.deepEqual(action.data, expected)
             s2.remove().then(() => {
