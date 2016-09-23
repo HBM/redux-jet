@@ -287,7 +287,108 @@ describe('reducers', () => {
         }
       }
       const state = sorted('foo')([{path: 'asd', value: 123, index: 1}], action)
-      assert.deepEqual(state, [{path: 'asd', value: 123, index: 1, pending: undefined, request: undefined, response: undefined}])
+      assert.deepEqual(state, [{path: 'asd', value: 123, index: 1}])
+    })
+
+    it('adds request data with data from JET_SET_REQUEST', () => {
+      const action = {
+        type: 'JET_SET_REQUEST',
+        path: 'asd',
+        value: 3334,
+        id: 3
+      }
+      const state = sorted('foo')([{path: 'asd', value: 123, index: 1}], action)
+      const expected = {
+        path: 'asd',
+        value: 123,
+        index: 1,
+        request: {
+          pending: true,
+          value: 3334,
+          id: 3
+        }
+      }
+      assert.deepEqual(state, [expected])
+    })
+
+    it('returns unmodified state if JET_SET_REQUEST path does not match', () => {
+      const action = {
+        type: 'JET_SET_REQUEST',
+        path: 'asd3',
+        value: 3334,
+        id: 3
+      }
+      const initial = {
+        path: 'asd',
+        value: 123,
+        index: 1
+      }
+      const state = sorted('foo')([initial], action)
+      assert.deepEqual(state, [initial])
+    })
+
+    it('JET_SET_REQUEST overwrites old request', () => {
+      const action = {
+        type: 'JET_SET_REQUEST',
+        path: 'asd',
+        value: 3334,
+        id: 3
+      }
+      const initial = {
+        path: 'asd',
+        value: 123,
+        index: 1,
+        request: {
+          value: 321,
+          pending: true,
+          id: 5
+        }
+      }
+      const expected = {
+        path: 'asd',
+        value: 123,
+        index: 1,
+        request: {
+          pending: true,
+          value: 3334,
+          id: 3
+        }
+      }
+      const state = sorted('foo')([initial], action)
+      assert.deepEqual(state, [expected])
+    })
+
+    it('JET_SET_SUCCESS sets result', () => {
+      const action = {
+        type: 'JET_SET_SUCCESS',
+        path: 'asd',
+        value: 321,
+        id: 3,
+        result: true
+      }
+      const initial = {
+        path: 'asd',
+        value: 123,
+        index: 1,
+        request: {
+          value: 321,
+          pending: true,
+          id: 3
+        }
+      }
+      const expected = {
+        path: 'asd',
+        value: 123, // value will not be changed by this action
+        index: 1,
+        request: {
+          pending: false,
+          value: 321,
+          result: true,
+          id: 3
+        }
+      }
+      const state = sorted('foo')([initial], action)
+      assert.deepEqual(state, [expected])
     })
 
     it('returns unmodified state if same id but unknown action.type', () => {
@@ -353,11 +454,11 @@ describe('reducers', () => {
       }
       const prevState = [
         {path: 'foo', value: 123, index: 3},
-        {path: 'asd', value: 2, index: 4, pending: true, request: 10, response: undefined}
+        {path: 'asd', value: 2, index: 4, request: 10}
       ]
       const state = array('foo')(prevState, action)
       const expected = [
-        {path: 'asd', value: 22, index: 3, pending: true, request: 10, response: undefined}
+        {path: 'asd', value: 22, index: 3, request: 10}
       ]
       assert.deepEqual(state, expected)
     })
