@@ -32,6 +32,10 @@
     "node-uuid": "^1.4.7"
   },
   "main": "./lib",
+  "files": [
+    "lib",
+    "src"
+  ],
   "version": "0.0.0",
   "repository": {
     "type": "git",
