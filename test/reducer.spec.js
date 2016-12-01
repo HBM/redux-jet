@@ -1,6 +1,6 @@
 /* globals describe it */
 import assert from 'assert'
-import { requests, request, sorted, unsorted, array, single, messages } from '../lib/reducers'
+import { requests, request, sorted, unsorted, array, single, messages } from '../src/reducers'
 
 describe('reducers', () => {
   describe('request (internal helper)', () => {
