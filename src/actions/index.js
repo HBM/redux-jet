@@ -1,5 +1,5 @@
 import * as api from '../api'
-import uuid from 'node-uuid'
+import uuid from 'uuid'
 
 /**
  * A connection is identified by the url, user and password.
