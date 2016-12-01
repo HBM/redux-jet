@@ -1,4 +1,4 @@
-import { Peer, Fetcher } from 'node-jet'
+import { Peer, Fetcher } from 'jet-browser'
 
 let peers = {}
 let pendings = {}

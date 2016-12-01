@@ -1,6 +1,6 @@
 /* globals describe it before afterEach */
 import assert from 'assert'
-import { connect, close, set, call, fetch, unfetch } from '../lib/actions'
+import { connect, close, set, call, fetch, unfetch } from '../src/actions'
 import { Daemon, Peer, State, Method } from 'node-jet'
 
 const url = 'ws://localhost:11123'
