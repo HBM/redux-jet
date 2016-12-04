@@ -424,6 +424,20 @@ describe('reducers', () => {
       assert.deepEqual(state, [expected])
     })
 
+    it('JET_GET_SUCCESS sets result', () => {
+      const action = {
+        type: 'JET_GET_SUCCESS',
+        expression: 'foo',
+        id: 'bar',
+        result: [{path: 'hello', value: 'world'}]
+      }
+      const state = sorted('bar')([], action)
+      assert.deepEqual(state, [{
+        path: 'hello',
+        value: 'world'
+      }])
+    })
+
     it('returns unmodified state if same id but unknown action.type', () => {
       const action = {
         type: 'JET_NOT_YET_IMPLEMENTED',
@@ -564,6 +578,20 @@ describe('reducers', () => {
       assert.deepEqual(state, [])
     })
 
+    it('JET_GET_SUCCESS sets result', () => {
+      const action = {
+        type: 'JET_GET_SUCCESS',
+        expression: 'foo',
+        id: 'bar',
+        result: [{path: 'hello', value: 'world'}]
+      }
+      const state = array('bar')([], action)
+      assert.deepEqual(state, [{
+        path: 'hello',
+        value: 'world'
+      }])
+    })
+
     it('returns unmodified state if same id but unknown action.type', () => {
       const action = {
         type: 'JET_NOT_YET_IMPLEMENTED',
@@ -656,6 +684,20 @@ describe('reducers', () => {
       }
       const state = unsorted('foo')({bla: {value: 123}}, action)
       assert.deepEqual(state, {})
+    })
+
+    it('JET_GET_SUCCESS sets result', () => {
+      const action = {
+        type: 'JET_GET_SUCCESS',
+        expression: 'foo',
+        id: 'bar',
+        result: [{path: 'hello', value: 'world'}]
+      }
+      const state = unsorted('bar')([], action)
+      assert.deepEqual(state, [{
+        path: 'hello',
+        value: 'world'
+      }])
     })
 
     it('returns unmodified state if same id but unknown action.type', () => {
@@ -780,6 +822,17 @@ describe('reducers', () => {
       }
       const state = single('foo')(undefined, action)
       assert.equal(state, null)
+    })
+
+    it('JET_GET_SUCCESS sets result', () => {
+      const action = {
+        type: 'JET_GET_SUCCESS',
+        expression: 'foo',
+        id: 'bar',
+        result: [{path: 'hello', value: 'world'}]
+      }
+      const state = single('bar')([], action)
+      assert.equal(state, 'world')
     })
 
     it('returns unmodified state if same id but unknown action.type', () => {

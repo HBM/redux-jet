@@ -91,3 +91,10 @@ export const call = (connection, path, args) => {
       return peer.call(path, args)
     })
 }
+
+export const get = (connection, expression) => {
+  return ensurePeer(connection)
+    .then((peer) => {
+      return peer.get(expression)
+    })
+}
