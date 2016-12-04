@@ -57,7 +57,11 @@ const _sorted = (state = [], action) => {
   switch (action.type) {
     case 'JET_FETCHER_FAILURE':
     case 'JET_FETCHER_REQUEST':
+    case 'JET_GET_FAILURE':
+    case 'JET_GET_REQUEST':
       return []
+    case 'JET_GET_SUCCESS':
+      return action.result
     case 'JET_FETCHER_DATA':
       if (!action.expression.sort) {
         console.error(`The fetch expression for id=${action.id} is not defined "sort".`)
@@ -161,7 +165,11 @@ export const array = (id) => (state = [], action) => {
   switch (action.type) {
     case 'JET_FETCHER_FAILURE':
     case 'JET_FETCHER_REQUEST':
+    case 'JET_GET_FAILURE':
+    case 'JET_GET_REQUEST':
       return []
+    case 'JET_GET_SUCCESS':
+      return action.result
     case 'JET_FETCHER_DATA':
       if (action.expression.sort) {
         return _sorted(state, action)
@@ -219,7 +227,11 @@ export const unsorted = (id) => (state = {}, action) => {
   switch (action.type) {
     case 'JET_FETCHER_FAILURE':
     case 'JET_FETCHER_REQUEST':
+    case 'JET_GET_FAILURE':
+    case 'JET_GET_REQUEST':
       return []
+    case 'JET_GET_SUCCESS':
+      return action.result
     case 'JET_FETCHER_DATA':
       let newState = {...state}
       const {path, value, event} = action.data[0]
@@ -263,7 +275,11 @@ export const single = (id) => (state = null, action) => {
   switch (action.type) {
     case 'JET_FETCHER_FAILURE':
     case 'JET_FETCHER_REQUEST':
+    case 'JET_GET_FAILURE':
+    case 'JET_GET_REQUEST':
       return null
+    case 'JET_GET_SUCCESS':
+      return action.result[0] ? action.result[0].value : null
     case 'JET_FETCHER_DATA':
       const {value, event} = action.data[0]
       if (event === 'add' || event === 'change') {

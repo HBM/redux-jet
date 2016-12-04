@@ -1,6 +1,6 @@
 /* globals describe it before afterEach */
 import assert from 'assert'
-import { connect, close, set, call, fetch, unfetch } from '../src/actions'
+import { connect, close, set, call, fetch, unfetch, get } from '../src/actions'
 import { Daemon, Peer, State, Method } from 'node-jet'
 
 const url = 'ws://localhost:11123'
@@ -228,6 +228,61 @@ describe('actions', () => {
           assert.equal(path, 'abc2')
           assert(error)
           assert(id)
+          done()
+        }
+      })
+    })
+  })
+
+  describe('get', () => {
+    let state
+
+    before(() => {
+      state = new State('yyy', 444)
+      return peer.add(state)
+    })
+
+    it('ok', (done) => {
+      let i = 0
+      const fexpression = {
+        path: {
+          equals: 'yyy'
+        }
+      }
+      get({url}, fexpression, 'someid')((action) => {
+        console.dir(action)
+        if (i === 0) {
+          const {expression, id, type} = action
+          assert.equal(type, 'JET_GET_REQUEST')
+          assert.deepEqual(expression, fexpression)
+          assert.equal(id, 'someid')
+          ++i
+        } else {
+          assert.equal(action.type, 'JET_GET_SUCCESS')
+          assert.deepEqual(action.expression.path, fexpression.path)
+          assert.equal(action.result[0].event, 'add')
+          assert.equal(action.result[0].path, 'yyy')
+          assert.equal(action.result[0].value, 444)
+          assert.equal(action.id, 'someid')
+          done()
+        }
+      })
+    })
+
+    it('fail', (done) => {
+      let i = 0
+      const fexpression = 123
+      get({url}, fexpression, 'someid')((action) => {
+        if (i === 0) {
+          const {expression, id, type} = action
+          assert.equal(type, 'JET_GET_REQUEST')
+          assert.deepEqual(expression, fexpression)
+          assert.equal(id, 'someid')
+          ++i
+        } else {
+          assert.equal(action.type, 'JET_GET_FAILURE')
+          assert.deepEqual(action.expression, fexpression)
+          assert(action.error)
           done()
         }
       })
