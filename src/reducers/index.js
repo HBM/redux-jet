@@ -56,9 +56,7 @@ const handleRequestResponse = (action, getElement) => {
 const _sorted = (state = [], action) => {
   switch (action.type) {
     case 'JET_FETCHER_FAILURE':
-    case 'JET_FETCHER_REQUEST':
     case 'JET_GET_FAILURE':
-    case 'JET_GET_REQUEST':
       return []
     case 'JET_GET_SUCCESS':
       return action.result
@@ -110,7 +108,7 @@ const _sorted = (state = [], action) => {
  * ...
  * combineReducer({foos: sorted(id)})
  */
-export const sorted = (id) => (state = [], action) => {
+export const sorted = (id, initialState = []) => (state = initialState, action) => {
   const element = handleRequestResponse(action, () => state.find(s => s.path === action.path))
   if (element) {
     const index = state.findIndex(s => s.path === action.path)
@@ -149,7 +147,7 @@ export const sorted = (id) => (state = [], action) => {
  * ...
  * combineReducer({foos: array(id)})
  */
-export const array = (id) => (state = [], action) => {
+export const array = (id, initialState = []) => (state = initialState, action) => {
   const element = handleRequestResponse(action, () => state.find(s => s.path === action.path))
   if (element) {
     const index = state.findIndex(s => s.path === action.path)
@@ -164,9 +162,7 @@ export const array = (id) => (state = [], action) => {
   }
   switch (action.type) {
     case 'JET_FETCHER_FAILURE':
-    case 'JET_FETCHER_REQUEST':
     case 'JET_GET_FAILURE':
-    case 'JET_GET_REQUEST':
       return []
     case 'JET_GET_SUCCESS':
       return action.result
@@ -216,7 +212,7 @@ export const array = (id) => (state = [], action) => {
  * combineReducer({foos: unsorted(id)})
  *
  */
-export const unsorted = (id) => (state = {}, action) => {
+export const unsorted = (id, initialState = {}) => (state = initialState, action) => {
   const element = handleRequestResponse(action, () => state[action.path])
   if (element) {
     return {...state, [action.path]: element}
@@ -226,9 +222,7 @@ export const unsorted = (id) => (state = {}, action) => {
   }
   switch (action.type) {
     case 'JET_FETCHER_FAILURE':
-    case 'JET_FETCHER_REQUEST':
     case 'JET_GET_FAILURE':
-    case 'JET_GET_REQUEST':
       return []
     case 'JET_GET_SUCCESS':
       return action.result
@@ -268,15 +262,13 @@ export const unsorted = (id) => (state = {}, action) => {
  * combineReducer({foobar: single(id)})
  *
  */
-export const single = (id) => (state = null, action) => {
+export const single = (id, initialState = null) => (state = initialState, action) => {
   if (action.id !== id) {
     return state
   }
   switch (action.type) {
     case 'JET_FETCHER_FAILURE':
-    case 'JET_FETCHER_REQUEST':
     case 'JET_GET_FAILURE':
-    case 'JET_GET_REQUEST':
       return null
     case 'JET_GET_SUCCESS':
       return action.result[0] ? action.result[0].value : null
