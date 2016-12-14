@@ -258,6 +258,14 @@ describe('reducers', () => {
       assert.deepEqual(sorted('foo')(undefined, action), [])
     })
 
+    it('returns empty array for JET_UNFETCH', () => {
+      const action = {
+        type: 'JET_UNFETCH',
+        id: 'foo'
+      }
+      assert.deepEqual(sorted('foo')([{foo: 123}], action), [])
+    })
+
     it('returns empty array for JET_FETCHER_REQUEST', () => {
       const action = {
         type: 'JET_FETCHER_REQUEST',
@@ -461,6 +469,14 @@ describe('reducers', () => {
       assert.deepEqual(array('foo')(undefined, action), [])
     })
 
+    it('returns empty array for JET_UNFETCH', () => {
+      const action = {
+        type: 'JET_UNFETCH',
+        id: 'foo'
+      }
+      assert.deepEqual(array('foo')([{foo: 123}], action), [])
+    })
+
     it('returns empty array for JET_FETCHER_REQUEST', () => {
       const action = {
         type: 'JET_FETCHER_REQUEST',
@@ -613,6 +629,14 @@ describe('reducers', () => {
         id: 'foo'
       }
       assert.deepEqual(unsorted('foo')(undefined, action), {})
+    })
+
+    it('returns empty object for JET_UNFETCH', () => {
+      const action = {
+        type: 'JET_UNFETCH',
+        id: 'foo'
+      }
+      assert.deepEqual(unsorted('foo')({foo: 123}, action), {})
     })
 
     it('returns empty object for JET_FETCHER_REQUEST', () => {
@@ -772,6 +796,14 @@ describe('reducers', () => {
         id: 'foo'
       }
       assert.equal(single('foo')(undefined, action), null)
+    })
+
+    it('returns null for JET_UNFETCH', () => {
+      const action = {
+        type: 'JET_UNFETCH',
+        id: 'foo'
+      }
+      assert.equal(single('foo')({foo: 123}, action), null)
     })
 
     it('returns null for JET_FETCHER_REQUEST', () => {
