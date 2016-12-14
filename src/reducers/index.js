@@ -57,6 +57,7 @@ const _sorted = (state = [], action) => {
   switch (action.type) {
     case 'JET_FETCHER_FAILURE':
     case 'JET_GET_FAILURE':
+    case 'JET_UNFETCH':
       return []
     case 'JET_GET_SUCCESS':
       return action.result
@@ -163,6 +164,7 @@ export const array = (id, initialState = []) => (state = initialState, action) =
   switch (action.type) {
     case 'JET_FETCHER_FAILURE':
     case 'JET_GET_FAILURE':
+    case 'JET_UNFETCH':
       return []
     case 'JET_GET_SUCCESS':
       return action.result
@@ -223,6 +225,7 @@ export const unsorted = (id, initialState = {}) => (state = initialState, action
   switch (action.type) {
     case 'JET_FETCHER_FAILURE':
     case 'JET_GET_FAILURE':
+    case 'JET_UNFETCH':
       return []
     case 'JET_GET_SUCCESS':
       return action.result
@@ -269,6 +272,7 @@ export const single = (id, initialState = null) => (state = initialState, action
   switch (action.type) {
     case 'JET_FETCHER_FAILURE':
     case 'JET_GET_FAILURE':
+    case 'JET_UNFETCH':
       return null
     case 'JET_GET_SUCCESS':
       return action.result[0] ? action.result[0].value : null

@@ -250,7 +250,6 @@ describe('actions', () => {
         }
       }
       get({url}, fexpression, 'someid')((action) => {
-        console.dir(action)
         if (i === 0) {
           const {expression, id, type} = action
           assert.equal(type, 'JET_GET_REQUEST')
