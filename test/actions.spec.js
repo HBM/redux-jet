@@ -1,6 +1,6 @@
 /* globals describe it before afterEach */
 import assert from 'assert'
-import { connect, close, set, call, fetch, unfetch, get, add, remove } from '../src/actions'
+import { connect, close, set, call, fetch, unfetch, get, add, remove, change } from '../src/actions'
 import { Daemon, Peer, State, Method } from 'node-jet'
 
 const url = 'ws://localhost:11123'
@@ -533,6 +533,47 @@ describe('actions', () => {
           assert.equal(action.path, 'foo/bar/notthere')
         } else if (i === 1) {
           assert.equal(action.type, 'JET_REMOVE_FAILURE')
+          assert.equal(action.path, 'foo/bar/notthere')
+          assert(action.error)
+          done()
+        }
+        ++i
+      })
+    })
+  })
+
+  describe('change', () => {
+    before(done => {
+      add({url}, 'foo/bar/changer', 33)(action => {
+        if (action.type === 'JET_ADD_SUCCESS') {
+          done()
+        }
+      })
+    })
+
+    it('works', done => {
+      let i = 0
+      change({url}, 'foo/bar/changer')(action => {
+        if (i === 0) {
+          assert.equal(action.type, 'JET_CHANGE_REQUEST')
+          assert.equal(action.path, 'foo/bar/changer')
+        } else if (i === 1) {
+          assert.equal(action.type, 'JET_CHANGE_SUCCESS')
+          assert.equal(action.path, 'foo/bar/changer')
+          done()
+        }
+        ++i
+      })
+    })
+
+    it('propagates error', done => {
+      let i = 0
+      change({url}, 'foo/bar/notthere')(action => {
+        if (i === 0) {
+          assert.equal(action.type, 'JET_CHANGE_REQUEST')
+          assert.equal(action.path, 'foo/bar/notthere')
+        } else if (i === 1) {
+          assert.equal(action.type, 'JET_CHANGE_FAILURE')
           assert.equal(action.path, 'foo/bar/notthere')
           assert(action.error)
           done()

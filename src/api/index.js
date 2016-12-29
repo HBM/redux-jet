@@ -137,5 +137,6 @@ export const change = (connection, path, value) => {
   if (!elements[id]) {
     return Promise.reject(invalidPath())
   }
-  return elements[id].value(value)
+  elements[id].value(value)
+  return Promise.resolve()
 }
