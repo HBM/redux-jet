@@ -341,3 +341,43 @@ export const get = (connection, expression, id) => (dispatch) => {
       dispatch({type: 'JET_GET_FAILURE', expression, error, id})
     })
 }
+
+export const add = (connection, path, ...args) => (dispatch) => {
+  const kind = typeof args[0] !== 'function' ? 'state' : 'method'
+  dispatch({type: 'JET_ADD_REQUEST', path, kind})
+
+  return api.add(connection, path, args).then(
+    () => {
+      dispatch({type: 'JET_ADD_SUCCESS', path, kind})
+    },
+    (error) => {
+      dispatch({type: 'JET_ADD_FAILURE', path, error})
+    }
+  )
+}
+
+export const remove = (connection, path) => (dispatch) => {
+  dispatch({type: 'JET_REMOVE_REQUEST', path})
+
+  return api.remove(connection, path).then(
+    () => {
+      dispatch({type: 'JET_REMOVE_SUCCESS', path})
+    },
+    (error) => {
+      dispatch({type: 'JET_REMOVE_FAILURE', path, error})
+    }
+  )
+}
+
+export const change = (connection, path, value) => (dispatch) => {
+  dispatch({type: 'JET_CHANGE_REQUEST', path, value})
+
+  return api.change(connection, path, value).then(
+    () => {
+      dispatch({type: 'JET_CHANGE_SUCCESS', path})
+    },
+    (error) => {
+      dispatch({type: 'JET_CHANGE_FAILURE', path, error})
+    }
+  )
+}

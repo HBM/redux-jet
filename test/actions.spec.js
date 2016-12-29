@@ -1,6 +1,6 @@
 /* globals describe it before afterEach */
 import assert from 'assert'
-import { connect, close, set, call, fetch, unfetch, get } from '../src/actions'
+import { connect, close, set, call, fetch, unfetch, get, add, remove } from '../src/actions'
 import { Daemon, Peer, State, Method } from 'node-jet'
 
 const url = 'ws://localhost:11123'
@@ -445,5 +445,100 @@ describe('actions', () => {
     assert.equal(action.url, url)
     assert.equal(action.type, 'JET_UNFETCH')
     assert.equal(action.id, 'someid')
+  })
+
+  describe('add', () => {
+    it('a Method', done => {
+      let i = 0
+      add({url}, 'foo/bar/method', () => {})((action) => {
+        if (i === 0) {
+          assert.equal(action.type, 'JET_ADD_REQUEST')
+          assert.equal(action.path, 'foo/bar/method')
+          assert.equal(action.kind, 'method')
+        } else if (i === 1) {
+          assert.equal(action.type, 'JET_ADD_SUCCESS')
+          assert.equal(action.path, 'foo/bar/method')
+          assert.equal(action.kind, 'method')
+          done()
+        }
+        ++i
+      })
+    })
+
+    it('a State', done => {
+      let i = 0
+      add({url}, 'foo/bar/state', 123, () => {})((action) => {
+        if (i === 0) {
+          assert.equal(action.type, 'JET_ADD_REQUEST')
+          assert.equal(action.path, 'foo/bar/state')
+          assert.equal(action.kind, 'state')
+        } else if (i === 1) {
+          assert.equal(action.type, 'JET_ADD_SUCCESS')
+          assert.equal(action.path, 'foo/bar/state')
+          assert.equal(action.kind, 'state')
+          done()
+        }
+        ++i
+      })
+    })
+
+    it('propagates error', done => {
+      let i = 0
+      add({url}, 'foo/bar/state2', 123, () => {})(() => {})
+      add({url}, 'foo/bar/state2', 123, () => {})((action) => {
+        if (i === 0) {
+          assert.equal(action.type, 'JET_ADD_REQUEST')
+          assert.equal(action.path, 'foo/bar/state2')
+          assert.equal(action.kind, 'state')
+        } else if (i === 1) {
+          assert.equal(action.type, 'JET_ADD_FAILURE')
+          assert.equal(action.path, 'foo/bar/state2')
+          assert(action.error)
+          done()
+        }
+        ++i
+      })
+    })
+  })
+
+  describe('remove', () => {
+    before(done => {
+      add({url}, 'foo/bar/removethis', () => {})(action => {
+        if (action.type === 'JET_ADD_SUCCESS') {
+          done()
+        }
+      })
+    })
+
+    it('works', done => {
+      let i = 0
+      remove({url}, 'foo/bar/removethis')(action => {
+        if (i === 0) {
+          assert.equal(action.type, 'JET_REMOVE_REQUEST')
+          assert.equal(action.path, 'foo/bar/removethis')
+        } else if (i === 1) {
+          assert.equal(action.type, 'JET_REMOVE_SUCCESS')
+          assert.equal(action.path, 'foo/bar/removethis')
+          done()
+        }
+        ++i
+      })
+    })
+
+    it('propagates error', done => {
+      let i = 0
+      remove({url}, 'foo/bar/notthere')(action => {
+        if (i === 0) {
+          assert.equal(action.type, 'JET_REMOVE_REQUEST')
+          assert.equal(action.path, 'foo/bar/notthere')
+        } else if (i === 1) {
+          assert.equal(action.type, 'JET_REMOVE_FAILURE')
+          assert.equal(action.path, 'foo/bar/notthere')
+          assert(action.error)
+          done()
+        }
+        ++i
+      })
+    })
   })
 })

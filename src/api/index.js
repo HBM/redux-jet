@@ -1,8 +1,9 @@
-import { Peer, Fetcher } from 'node-jet'
+import { Peer, Fetcher, State, Method } from 'node-jet'
 
 let peers = {}
 let pendings = {}
 let fetchers = {}
+let elements = {}
 
 const ensurePeer = ({url, user, password, onSend, onReceive}) => {
   return new Promise((resolve, reject) => {
@@ -97,4 +98,44 @@ export const get = (connection, expression) => {
     .then((peer) => {
       return peer.get(expression)
     })
+}
+
+export const add = (connection, path, args) => {
+  return ensurePeer(connection)
+    .then((peer) => {
+      let element
+      if (typeof args[0] === 'function') {
+        element = new Method(path)
+        element.on('call', args[0])
+      } else {
+        element = new State(path, args[0])
+        if (args[1]) {
+          element.on('set', args[1])
+        }
+      }
+      return peer.add(element).then(() => {
+        const id = [connection.url, connection.user, connection.password, path].join('--')
+        elements[id] = element
+      })
+    })
+}
+
+const invalidPath = path => new Error('no such state or method:' + path)
+
+export const remove = (connection, path) => {
+  const id = [connection.url, connection.user, connection.password, path].join('--')
+  if (!elements[id]) {
+    return Promise.reject(invalidPath())
+  }
+  return elements[id].remove().then(() => {
+    delete elements[id]
+  })
+}
+
+export const change = (connection, path, value) => {
+  const id = [connection.url, connection.user, connection.password, path].join('--')
+  if (!elements[id]) {
+    return Promise.reject(invalidPath())
+  }
+  return elements[id].value(value)
 }
