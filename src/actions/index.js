@@ -356,6 +356,59 @@ export const add = (connection, path, ...args) => (dispatch) => {
   )
 }
 
+/**
+ * A State's "set" callback handler. Called whenever a Peer tries to set the state to a new value.
+ *
+ * @callback stateCallback
+ * @this State
+ * @param {*} newValue - The new requested value
+ * @param {function} [reply] - For async set handlers
+ *
+ * @see {@link https://github.com/lipp/node-jet/blob/master/doc/peer.markdown#stateonset-cb|node-jet documentation}
+ */
+
+/**
+ * Adds a (local) state to the Jet daemon.
+ *
+ * @function addState
+ * @param {Connection} connection - The connection specification
+ * @param {String} path - The unique path of the state
+ * @param {*} initialValue - The state's initial value
+ * @param {stateCallback} [onSet] - The set callback handler (don't use fat arrow for accessing "this")
+ */
+export const addState = (connection, path, initialValue, onSet) => {
+  return add(connection, path, initialValue, onSet)
+}
+
+/**
+ * A Method's "call" callback handler. Called whenever a Peer tries to call the method.
+ *
+ * @callback methodCallback
+ * @param {Array<*>} args - The arguments
+ * @param {function} [reply] - For async call handlers
+ *
+ * @see {@link https://github.com/lipp/node-jet/blob/master/doc/peer.markdown#methodoncall-cb|node-jet documentation}
+ */
+
+/**
+ * Adds a method to the Jet daemon.
+ *
+ * @function addMethod
+ * @param {Connection} connection - The connection specification
+ * @param {String} path - The unique path of the method
+ * @param {methodCallback} onCall - The on call callback handler
+ */
+export const addMethod = (connection, path, onCall) => {
+  return add(connection, path, onCall)
+}
+
+/**
+ * Removes a state or method.
+ *
+ * @function remove
+ * @param {Connection} connection - The connection specification
+ * @param {String} path - The unique path of the state or method to remove
+ */
 export const remove = (connection, path) => (dispatch) => {
   dispatch({type: 'JET_REMOVE_REQUEST', path})
 
@@ -369,6 +422,15 @@ export const remove = (connection, path) => (dispatch) => {
   )
 }
 
+/**
+ * Posts a state change. The state must have been previously added with {@link addState}.
+ * To change/set a non-locally added State, call {@link set}.
+ *
+ * @function change
+ * @param {Connection} connection - The connection specification
+ * @param {String} path - The unique path of the state
+ * @param {*} newValue - The state's new Value
+ */
 export const change = (connection, path, value) => (dispatch) => {
   dispatch({type: 'JET_CHANGE_REQUEST', path, value})
 
