@@ -46,6 +46,8 @@ import uuid from 'uuid'
  * @property {string} [password]
  */
 
+const onClose = (dispatch, connection) => () => dispatch({type: 'JET_CLOSED', ...connection})
+
 /**
  * Explicitly connect to a Jet Daemon.
  * A Promise/thunk based action creator.
@@ -60,7 +62,9 @@ import uuid from 'uuid'
  * @param {Connection} connection - The connection specification
  * @param {boolean} [debug = false] - If true, {@link JET_DEBUG} actions will be issued.
  */
-export const connect = ({url, user, password}, debug) => (dispatch) => {
+
+export const connect = (connection, debug) => (dispatch) => {
+  const {url, user, password} = connection
   dispatch({type: 'JET_CONNECT_REQUEST', url, user, password})
   let onReceive
   let onSend
@@ -73,7 +77,7 @@ export const connect = ({url, user, password}, debug) => (dispatch) => {
     }
   }
 
-  return api.connect({url, user, password, onReceive, onSend}).then(
+  return api.connect({url, user, password, onReceive, onSend}, onClose(dispatch, connection)).then(
     (response) => {
       dispatch({type: 'JET_CONNECT_SUCCESS', url, user, password})
     },
@@ -180,7 +184,7 @@ export const fetch = (connection, expression, id) => (dispatch) => {
     dispatch({type: 'JET_FETCHER_DATA', data: data, id, expression})
   }
 
-  return api.fetch(connection, expression, id, onData).then(
+  return api.fetch(connection, expression, id, onData, onClose(dispatch, connection)).then(
     (response) => {
       dispatch({type: 'JET_FETCHER_SUCCESS', expression, id})
     },
@@ -230,7 +234,7 @@ export const set = (connection, path, value) => (dispatch) => {
   const id = uuid.v1()
   dispatch({type: 'JET_SET_REQUEST', path, value, id})
 
-  return api.set(connection, path, value).then(
+  return api.set(connection, path, value, onClose(dispatch, connection)).then(
     () => {
       dispatch({type: 'JET_SET_SUCCESS', path, value, id})
     },
@@ -282,7 +286,7 @@ export const call = (connection, path, args) => (dispatch) => {
   const id = uuid.v1()
   dispatch({type: 'JET_CALL_REQUEST', path, args, id})
 
-  return api.call(connection, path, args).then(
+  return api.call(connection, path, args, onClose(dispatch, connection)).then(
     (result) => {
       dispatch({type: 'JET_CALL_SUCCESS', path, args, result, id})
     },
@@ -333,7 +337,7 @@ export const call = (connection, path, args) => (dispatch) => {
 export const get = (connection, expression, id) => (dispatch) => {
   dispatch({type: 'JET_GET_REQUEST', expression, id})
 
-  return api.get(connection, expression).then(
+  return api.get(connection, expression, onClose(dispatch, connection)).then(
     (result) => {
       dispatch({type: 'JET_GET_SUCCESS', expression, id, result})
     },
@@ -346,7 +350,7 @@ export const add = (connection, path, ...args) => (dispatch) => {
   const kind = typeof args[0] !== 'function' ? 'state' : 'method'
   dispatch({type: 'JET_ADD_REQUEST', path, kind})
 
-  return api.add(connection, path, args).then(
+  return api.add(connection, path, args, onClose(dispatch, connection)).then(
     () => {
       dispatch({type: 'JET_ADD_SUCCESS', path, kind})
     },

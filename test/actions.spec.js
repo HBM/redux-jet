@@ -67,11 +67,15 @@ describe('actions', () => {
       })
     })
 
-    it('twice (fast)', () => {
+    it('twice (fast)', done => {
       const noop = () => {}
       close({url})
       connect({url})(noop)
-      return connect({url})(noop)
+      connect({url})(action => {
+        if (action.type === 'JET_CONNECT_SUCCESS') {
+          done()
+        }
+      })
     })
 
     it('fail', (done) => {
@@ -85,7 +89,7 @@ describe('actions', () => {
             user: undefined
           })
           ++i
-        } else {
+        } else if (i === 1) {
           const {type, url, error} = action
           assert.equal(type, 'JET_CONNECT_FAILURE')
           assert.equal(url, 'ws://foo.bar:11123')
@@ -100,15 +104,16 @@ describe('actions', () => {
     connect({url})((action) => {
       if (action.type === 'JET_CONNECT_SUCCESS') {
         close({url})
+      }
+      if (action.type === 'JET_CLOSED') {
         done()
       }
     })
-    // TODO: no way to tell this was ok
   })
 
   it('close', () => {
-    close({url: 'ws://localhost.bar:123'})
-    // TODO: no way to tell this was ok
+    const action = close({url: 'ws://localhost.bar:123'})
+    assert.equal(action.type, 'JET_CLOSE')
   })
 
   describe('set', () => {
