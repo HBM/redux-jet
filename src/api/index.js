@@ -5,7 +5,7 @@ let pendings = {}
 let fetchers = {}
 let elements = {}
 
-const ensurePeer = ({url, user, password, onSend, onReceive}) => {
+const ensurePeer = ({url, user, password, onSend, onReceive}, onClose) => {
   return new Promise((resolve, reject) => {
     const id = [url, user, password].join('--')
     if (!peers[id]) {
@@ -29,6 +29,9 @@ const ensurePeer = ({url, user, password, onSend, onReceive}) => {
 
       peer.closed().then(() => {
         delete peers[id]
+        if (!pendings[id]) {
+          onClose()
+        }
       })
     }
 
@@ -40,8 +43,8 @@ const ensurePeer = ({url, user, password, onSend, onReceive}) => {
   })
 }
 
-export const connect = (connection) => {
-  return ensurePeer(connection)
+export const connect = (connection, onClose) => {
+  return ensurePeer(connection, onClose)
 }
 
 export const close = (connection) => {
@@ -62,8 +65,8 @@ export const unfetch = (connection, id) => {
   delete fetchers[fid]
 }
 
-export const fetch = (connection, expression, id, onStatesDidChange) => {
-  return ensurePeer(connection)
+export const fetch = (connection, expression, id, onStatesDidChange, onClose) => {
+  return ensurePeer(connection, onClose)
     .then((peer) => {
       const {url, user, password} = connection
       const fid = [url, user, password, id].join('--')
@@ -79,29 +82,29 @@ export const fetch = (connection, expression, id, onStatesDidChange) => {
     })
 }
 
-export const set = (connection, path, value) => {
-  return ensurePeer(connection)
+export const set = (connection, path, value, onClose) => {
+  return ensurePeer(connection, onClose)
     .then((peer) => {
       return peer.set(path, value)
     })
 }
 
-export const call = (connection, path, args) => {
-  return ensurePeer(connection)
+export const call = (connection, path, args, onClose) => {
+  return ensurePeer(connection, onClose)
     .then((peer) => {
       return peer.call(path, args)
     })
 }
 
-export const get = (connection, expression) => {
-  return ensurePeer(connection)
+export const get = (connection, expression, onClose) => {
+  return ensurePeer(connection, onClose)
     .then((peer) => {
       return peer.get(expression)
     })
 }
 
-export const add = (connection, path, args) => {
-  return ensurePeer(connection)
+export const add = (connection, path, args, onClose) => {
+  return ensurePeer(connection, onClose)
     .then((peer) => {
       let element
       if (typeof args[0] === 'function') {
