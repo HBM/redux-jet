@@ -192,6 +192,14 @@ describe('reducers', () => {
       assert.deepEqual(req(undefined, {}), [])
     })
 
+    it('JET_CLOSE clears array', () => {
+      const req = requests()
+      const state = req([12, 23], {
+        type: 'JET_CLOSE'
+      })
+      assert.deepEqual(state, [])
+    })
+
     it('push request', () => {
       const req = requests()
       const action = {
@@ -248,6 +256,14 @@ describe('reducers', () => {
   describe('sorted', () => {
     it('default is empty array', () => {
       assert.deepEqual(sorted('foo')(undefined, {}), [])
+    })
+
+    it('JET_CLOSE clears array', () => {
+      const s = sorted('foo')
+      const state = s([12, 23], {
+        type: 'JET_CLOSE'
+      })
+      assert.deepEqual(state, [])
     })
 
     it('returns empty array for JET_FETCHER_FAILURE', () => {
@@ -461,6 +477,14 @@ describe('reducers', () => {
       assert.deepEqual(array('foo')(undefined, {}), [])
     })
 
+    it('JET_CLOSE clears array', () => {
+      const a = array('foo')
+      const state = a([12, 23], {
+        type: 'JET_CLOSE'
+      })
+      assert.deepEqual(state, [])
+    })
+
     it('returns empty array for JET_FETCHER_FAILURE', () => {
       const action = {
         type: 'JET_FETCHER_FAILURE',
@@ -622,6 +646,14 @@ describe('reducers', () => {
   describe('unsorted', () => {
     it('default is empty object', () => {
       assert.deepEqual(unsorted('foo')(undefined, {}), {})
+    })
+
+    it('JET_CLOSE clears object', () => {
+      const u = unsorted('foo')
+      const state = u({x: 123}, {
+        type: 'JET_CLOSE'
+      })
+      assert.deepEqual(state, {})
     })
 
     it('returns empty object for JET_FETCHER_FAILURE', () => {
@@ -790,6 +822,14 @@ describe('reducers', () => {
   describe('single', () => {
     it('default is null', () => {
       assert.equal(single('foo')(undefined, {}), null)
+    })
+
+    it('JET_CLOSE clears state', () => {
+      const s = single('foo')
+      const state = s({x: 123}, {
+        type: 'JET_CLOSE'
+      })
+      assert.deepEqual(state, null)
     })
 
     it('returns null for JET_FETCHER_FAILURE', () => {

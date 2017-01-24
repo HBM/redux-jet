@@ -58,6 +58,7 @@ const _sorted = (state = [], action) => {
     case 'JET_FETCHER_FAILURE':
     case 'JET_GET_FAILURE':
     case 'JET_UNFETCH':
+    case 'JET_CLOSE':
       return []
     case 'JET_GET_SUCCESS':
       return action.result
@@ -119,7 +120,7 @@ export const sorted = (id, initialState = []) => (state = initialState, action) 
       ...state.slice(index + 1)
     ]
   }
-  if (action.id !== id) {
+  if (action.type !== 'JET_CLOSE' && action.id !== id) {
     return state
   }
   return _sorted(state, action)
@@ -158,13 +159,14 @@ export const array = (id, initialState = []) => (state = initialState, action) =
       ...state.slice(index + 1)
     ]
   }
-  if (action.id !== id) {
+  if (action.type !== 'JET_CLOSE' && action.id !== id) {
     return state
   }
   switch (action.type) {
     case 'JET_FETCHER_FAILURE':
     case 'JET_GET_FAILURE':
     case 'JET_UNFETCH':
+    case 'JET_CLOSE':
       return []
     case 'JET_GET_SUCCESS':
       return action.result
@@ -219,14 +221,15 @@ export const unsorted = (id, initialState = {}) => (state = initialState, action
   if (element) {
     return {...state, [action.path]: element}
   }
-  if (action.id !== id) {
+  if (action.type !== 'JET_CLOSE' && action.id !== id) {
     return state
   }
   switch (action.type) {
     case 'JET_FETCHER_FAILURE':
     case 'JET_GET_FAILURE':
     case 'JET_UNFETCH':
-      return []
+    case 'JET_CLOSE':
+      return {}
     case 'JET_GET_SUCCESS':
       return action.result
     case 'JET_FETCHER_DATA':
@@ -270,13 +273,14 @@ export const single = (id, initialState = null) => (state = initialState, action
   if (element) {
     return element
   }
-  if (action.id !== id) {
+  if (action.type !== 'JET_CLOSE' && action.id !== id) {
     return state
   }
   switch (action.type) {
     case 'JET_FETCHER_FAILURE':
     case 'JET_GET_FAILURE':
     case 'JET_UNFETCH':
+    case 'JET_CLOSE':
       return null
     case 'JET_GET_SUCCESS':
       return action.result[0] ? action.result[0] : null
@@ -339,6 +343,8 @@ export const request = (state, action) => {
 export const requests = (maxLength = 100) => (state = [], action) => {
   const start = state.length - maxLength
   switch (action.type) {
+    case 'JET_CLOSE':
+      return []
     case 'JET_SET_REQUEST':
     case 'JET_CALL_REQUEST':
       return [
