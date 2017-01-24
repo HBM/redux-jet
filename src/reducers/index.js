@@ -172,9 +172,9 @@ export const array = (id, initialState = []) => (state = initialState, action) =
       if (action.expression.sort) {
         return _sorted(state, action)
       } else {
-        const {path, event, value} = action.data[0]
+        const {path, event, value, fetchOnly = false} = action.data[0]
         if (event === 'add') {
-          return [...state, {path, value}]
+          return [...state, {path, value, fetchOnly}]
         } else if (event === 'change') {
           const index = state.findIndex(e => e.path === path)
           return [
@@ -231,11 +231,11 @@ export const unsorted = (id, initialState = {}) => (state = initialState, action
       return action.result
     case 'JET_FETCHER_DATA':
       let newState = {...state}
-      const {path, value, event} = action.data[0]
+      const {path, value, event, fetchOnly = false} = action.data[0]
       if (event === 'remove') {
         delete newState[path]
       } else {
-        newState[path] = {...newState[path], value}
+        newState[path] = {...newState[path], value, fetchOnly}
       }
       return newState
     default:
@@ -266,6 +266,10 @@ export const unsorted = (id, initialState = {}) => (state = initialState, action
  *
  */
 export const single = (id, initialState = null) => (state = initialState, action) => {
+  const element = handleRequestResponse(action, () => state && state.path === action.path && state)
+  if (element) {
+    return element
+  }
   if (action.id !== id) {
     return state
   }
@@ -275,11 +279,11 @@ export const single = (id, initialState = null) => (state = initialState, action
     case 'JET_UNFETCH':
       return null
     case 'JET_GET_SUCCESS':
-      return action.result[0] ? action.result[0].value : null
+      return action.result[0] ? action.result[0] : null
     case 'JET_FETCHER_DATA':
-      const {value, event} = action.data[0]
+      const {value, event, fetchOnly = false, path} = action.data[0]
       if (event === 'add' || event === 'change') {
-        return value
+        return {value, fetchOnly, path}
       } else {
         return null
       }
