@@ -562,7 +562,8 @@ describe('reducers', () => {
         },
         {
           path: 'foo',
-          value: 123
+          value: 123,
+          fetchOnly: false
         }
       ])
     })
@@ -674,12 +675,13 @@ describe('reducers', () => {
         data: [{
           path: 'bla',
           value: 123,
-          event: 'add'
+          event: 'add',
+          fetchOnly: true
         }],
         id: 'foo'
       }
       const state = unsorted('foo')(undefined, action)
-      assert.deepEqual(state, {bla: {value: 123}})
+      assert.deepEqual(state, {bla: {value: 123, fetchOnly: true}})
     })
 
     it('returns object with data from JET_FETCHER_DATA / change event', () => {
@@ -693,7 +695,7 @@ describe('reducers', () => {
         id: 'foo'
       }
       const state = unsorted('foo')({bla: {value: 333}}, action)
-      assert.deepEqual(state, {bla: {value: 123}})
+      assert.deepEqual(state, {bla: {value: 123, fetchOnly: false}})
     })
 
     it('returns object with data from JET_FETCHER_DATA / remove event', () => {
@@ -825,7 +827,7 @@ describe('reducers', () => {
         id: 'foo'
       }
       const state = single('foo')(undefined, action)
-      assert.equal(state, 123)
+      assert.deepEqual(state, {value: 123, fetchOnly: false, path: 'bla'})
     })
 
     it('returns object with data.value from JET_FETCHER_DATA / change event', () => {
@@ -839,7 +841,7 @@ describe('reducers', () => {
         id: 'foo'
       }
       const state = single('foo')(undefined, action)
-      assert.equal(state, 123)
+      assert.deepEqual(state, {value: 123, path: 'bla', fetchOnly: false})
     })
 
     it('returns null from JET_FETCHER_DATA / remove event', () => {
@@ -856,6 +858,28 @@ describe('reducers', () => {
       assert.equal(state, null)
     })
 
+    it('adds request entry for JET_CALL_REQUEST action', () => {
+      const action = {
+        type: 'JET_CALL_REQUEST',
+        path: 'bla',
+        args: [333],
+        id: 'ddd'
+      }
+      const initial = {
+        path: 'bla',
+        fetchOnly: true
+      }
+      const state = single('foo')(initial, action)
+      assert.deepEqual(state, {
+        ...initial,
+        request: {
+          pending: true,
+          args: [333],
+          id: 'ddd'
+        }
+      })
+    })
+
     it('JET_GET_SUCCESS sets result', () => {
       const action = {
         type: 'JET_GET_SUCCESS',
@@ -864,7 +888,7 @@ describe('reducers', () => {
         result: [{path: 'hello', value: 'world'}]
       }
       const state = single('bar')([], action)
-      assert.equal(state, 'world')
+      assert.equal(state.value, 'world')
     })
 
     it('returns unmodified state if same id but unknown action.type', () => {
