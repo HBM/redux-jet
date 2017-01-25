@@ -328,6 +328,7 @@ describe('actions', () => {
           assert.equal(action.data[0].path, 'ppp')
           assert.equal(action.data[0].value, 444)
           assert.equal(action.id, 'someid')
+          unfetch({url}, 'someid')
           done()
         }
       })
@@ -361,6 +362,7 @@ describe('actions', () => {
           assert.equal(action.data[0].path, 'ppp')
           assert.equal(action.data[0].value, 444)
           assert.equal(action.id, 'someid')
+          unfetch({url}, 'someid')
           done()
         }
       })
@@ -381,6 +383,7 @@ describe('actions', () => {
           assert.equal(expression, 1)
           assert.equal(id, 'someid')
           assert(error)
+          unfetch({url}, 'someid')
           done()
         }
       })
@@ -402,8 +405,12 @@ describe('actions', () => {
       peer.add(s2).then(() => {
         fetch({url}, expression, 'someid')((action) => {
           if (i === 0) {
+            assert.equal(action.type, 'JET_FETCHER_REQUEST')
             ++i
           } else if (i === 1) {
+            assert.equal(action.type, 'JET_FETCHER_SUCCESS')
+            ++i
+          } else if (i === 2) {
             assert.equal(action.type, 'JET_FETCHER_DATA')
             const expected = [
               [
@@ -415,7 +422,7 @@ describe('actions', () => {
             assert.deepEqual(action.data, expected)
             s2.value(6666)
             ++i
-          } else if (i === 2) {
+          } else if (i === 3) {
             assert.equal(action.type, 'JET_FETCHER_DATA')
             const expected = [
               [
@@ -424,6 +431,7 @@ describe('actions', () => {
               2
             ]
             assert.deepEqual(action.data, expected)
+            unfetch({url}, 'someid')
             s2.remove().then(() => {
               done()
             })
