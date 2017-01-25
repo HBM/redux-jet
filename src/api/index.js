@@ -55,12 +55,14 @@ export const close = (connection) => {
   }
 }
 
+const noop = () => {}
+
 export const unfetch = (connection, id) => {
   const {url, user, password} = connection
   const fid = [url, user, password, id].join('--')
   let fetcher = fetchers[fid]
   if (fetcher) {
-    fetcher.unfetch()
+    fetcher.unfetch().catch(noop)
   }
   delete fetchers[fid]
 }
@@ -72,7 +74,7 @@ export const fetch = (connection, expression, id, onStatesDidChange, onClose) =>
       const fid = [url, user, password, id].join('--')
       let fetcher = fetchers[fid]
       if (fetcher) {
-        fetcher.unfetch()
+        fetcher.unfetch().catch(noop)
       }
       fetcher = new Fetcher()
         .expression(expression)
