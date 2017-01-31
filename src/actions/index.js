@@ -101,11 +101,13 @@ export const connect = (connection, debug) => (dispatch) => {
  *
  * @function close
  * @param {Connection} connection - The connection specification
+ * @param {Boolean} [force=false] - Force an immediate connection drop. Use
+ *   This if you have evidence that server specified with 'connection' died / is unreachable.
  *
  */
-export const close = ({url, user, password}) => {
-  api.close({url, user, password})
-  return {type: 'JET_CLOSE', url, user, password}
+export const close = ({url, user, password}, force = false) => {
+  api.close({url, user, password}, force)
+  return {type: 'JET_CLOSE', url, user, password, force}
 }
 
 /**

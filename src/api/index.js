@@ -4,6 +4,7 @@ let peers = {}
 let pendings = {}
 let fetchers = {}
 let elements = {}
+let onCloseCbs = {}
 
 const ensurePeer = ({url, user, password, onSend, onReceive}, onClose) => {
   return new Promise((resolve, reject) => {
@@ -12,6 +13,10 @@ const ensurePeer = ({url, user, password, onSend, onReceive}, onClose) => {
       pendings[id] = []
       const peer = new Peer({url, user, password, onSend, onReceive})
       peers[id] = peer
+      onCloseCbs[id] = () => {
+        delete onCloseCbs[id]
+        onClose()
+      }
 
       peer.connect()
         .then(() => {
@@ -21,6 +26,9 @@ const ensurePeer = ({url, user, password, onSend, onReceive}, onClose) => {
           delete pendings[id]
         })
         .catch((err) => {
+          if (!pendings[id]) {
+            return
+          }
           pendings[id].forEach((pending) => {
             pending.reject(err)
           })
@@ -28,10 +36,12 @@ const ensurePeer = ({url, user, password, onSend, onReceive}, onClose) => {
         })
 
       peer.closed().then(() => {
-        delete peers[id]
-        if (!pendings[id]) {
-          onClose()
+        if (!pendings[id] && peers[id]) {
+          if (onCloseCbs[id]) {
+            onCloseCbs[id]()
+          }
         }
+        delete peers[id]
       })
     }
 
@@ -47,11 +57,21 @@ export const connect = (connection, onClose) => {
   return ensurePeer(connection, onClose)
 }
 
-export const close = (connection) => {
+export const close = (connection, force) => {
   const {url, user, password} = connection
   const id = [url, user, password].join('--')
   if (peers[id]) {
     peers[id].close()
+    if (force) {
+      if (pendings[id]) {
+        pendings[id].forEach(pending => {
+          pending.reject('forced close')
+        })
+        delete pendings[id]
+      }
+      delete onCloseCbs[id]
+      delete peers[id]
+    }
   }
 }
 
