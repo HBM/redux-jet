@@ -100,7 +100,7 @@ describe('actions', () => {
     })
   })
 
-  it('connect -> close', (done) => {
+  it('connect (wait) -> close', (done) => {
     connect({url})((action) => {
       if (action.type === 'JET_CONNECT_SUCCESS') {
         close({url})
@@ -109,6 +109,45 @@ describe('actions', () => {
         done()
       }
     })
+  })
+
+  it('connect -> close', (done) => {
+    connect({url})((action) => {
+      if (action.type === 'JET_CONNECT_FAILURE') {
+        done()
+      }
+    })
+    close({url})
+  })
+
+  it('connect (wait) -> close(force)', (done) => {
+    let unexpectedAction
+    connect({url})((action) => {
+      if (action.type === 'JET_CONNECT_SUCCESS') {
+        close({url}, true)
+      }
+      if (action.type !== 'JET_CONNECT_SUCCESS' && action.type !== 'JET_CONNECT_REQUEST') {
+        unexpectedAction = true
+      }
+    })
+    setTimeout(() => {
+      assert(!unexpectedAction)
+      done()
+    }, 100)
+  })
+
+  it('connect -> close(force)', (done) => {
+    let unexpectedAction
+    connect({url})((action) => {
+      if (action.type !== 'JET_CONNECT_FAILURE' && action.type !== 'JET_CONNECT_REQUEST') {
+        unexpectedAction = true
+      }
+    })
+    close({url}, true)
+    setTimeout(() => {
+      assert(!unexpectedAction)
+      done()
+    }, 100)
   })
 
   it('close', () => {
