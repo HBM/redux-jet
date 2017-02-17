@@ -6,12 +6,12 @@ let fetchers = {}
 let elements = {}
 let onCloseCbs = {}
 
-const ensurePeer = ({url, user, password, onSend, onReceive}, onClose) => {
+const ensurePeer = ({url, user, password, headers, onSend, onReceive}, onClose) => {
   return new Promise((resolve, reject) => {
-    const id = [url, user, password].join('--')
+    const id = [url, user, password, JSON.stringify(headers)].join('--')
     if (!peers[id]) {
       pendings[id] = []
-      const peer = new Peer({url, user, password, onSend, onReceive})
+      const peer = new Peer({url, user, password, headers, onSend, onReceive})
       peers[id] = peer
       onCloseCbs[id] = () => {
         delete onCloseCbs[id]
@@ -58,8 +58,8 @@ export const connect = (connection, onClose) => {
 }
 
 export const close = (connection, force) => {
-  const {url, user, password} = connection
-  const id = [url, user, password].join('--')
+  const {url, user, password, headers} = connection
+  const id = [url, user, password, JSON.stringify(headers)].join('--')
   if (peers[id]) {
     peers[id].close()
     if (force) {
@@ -78,8 +78,8 @@ export const close = (connection, force) => {
 const noop = () => {}
 
 export const unfetch = (connection, id) => {
-  const {url, user, password} = connection
-  const fid = [url, user, password, id].join('--')
+  const {url, user, password, headers} = connection
+  const fid = [url, user, password, JSON.stringify(headers), id].join('--')
   let fetcher = fetchers[fid]
   if (fetcher) {
     fetcher.unfetch().catch(noop)
@@ -90,8 +90,8 @@ export const unfetch = (connection, id) => {
 export const fetch = (connection, expression, id, onStatesDidChange, onClose) => {
   return ensurePeer(connection, onClose)
     .then((peer) => {
-      const {url, user, password} = connection
-      const fid = [url, user, password, id].join('--')
+      const {url, user, password, headers} = connection
+      const fid = [url, user, password, JSON.stringify(headers), id].join('--')
       let fetcher = fetchers[fid]
       if (fetcher) {
         fetcher.unfetch().catch(noop)
@@ -139,7 +139,7 @@ export const add = (connection, path, args, onClose) => {
         }
       }
       return peer.add(element).then(() => {
-        const id = [connection.url, connection.user, connection.password, path].join('--')
+        const id = [connection.url, connection.user, connection.password, JSON.stringify(connection.headers), path].join('--')
         elements[id] = element
       })
     })
@@ -148,7 +148,7 @@ export const add = (connection, path, args, onClose) => {
 const invalidPath = path => new Error('no such state or method:' + path)
 
 export const remove = (connection, path) => {
-  const id = [connection.url, connection.user, connection.password, path].join('--')
+  const id = [connection.url, connection.user, connection.password, JSON.stringify(connection.headers), path].join('--')
   if (!elements[id]) {
     return Promise.reject(invalidPath())
   }
@@ -158,7 +158,7 @@ export const remove = (connection, path) => {
 }
 
 export const change = (connection, path, value) => {
-  const id = [connection.url, connection.user, connection.password, path].join('--')
+  const id = [connection.url, connection.user, connection.password, JSON.stringify(connection.headers), path].join('--')
   if (!elements[id]) {
     return Promise.reject(invalidPath())
   }

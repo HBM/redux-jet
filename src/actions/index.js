@@ -7,6 +7,7 @@ import uuid from 'uuid'
  * @property {string} url - The Jet Daemon websocket url, like "ws://foo.bar:1234"
  * @property {string} [user] - The user (name) to login for
  * @property {string} [password] - The passowrd belonging to the specified user
+ * @property {object} [headers] - Custom headers (for alternative authentication)
  */
 
 /**
@@ -15,6 +16,7 @@ import uuid from 'uuid'
  * @property {string} url
  * @property {string} [user]
  * @property {string} [password]
+ * @property {object} [headers] - Custom headers (for alternative authentication)
  */
 
 /**
@@ -23,6 +25,7 @@ import uuid from 'uuid'
  * @property {string} url
  * @property {string} [user]
  * @property {string} [password]
+ * @property {object} [headers] - Custom headers (for alternative authentication)
  */
 
 /**
@@ -44,6 +47,7 @@ import uuid from 'uuid'
  * @property {Error} error
  * @property {string} [user]
  * @property {string} [password]
+ * @property {object} [headers] - Custom headers (for alternative authentication)
  */
 
 const onClose = (dispatch, connection) => () => dispatch({type: 'JET_CLOSED', ...connection})
@@ -64,25 +68,25 @@ const onClose = (dispatch, connection) => () => dispatch({type: 'JET_CLOSED', ..
  */
 
 export const connect = (connection, debug) => (dispatch) => {
-  const {url, user, password} = connection
-  dispatch({type: 'JET_CONNECT_REQUEST', url, user, password})
+  const {url, user, password, headers} = connection
+  dispatch({type: 'JET_CONNECT_REQUEST', url, user, password, headers})
   let onReceive
   let onSend
   if (debug) {
     onReceive = (string, json) => {
-      dispatch({type: 'JET_DEBUG', url, user, password, string, json, timestamp: new Date(), direction: 'in'})
+      dispatch({type: 'JET_DEBUG', url, user, password, headers, string, json, timestamp: new Date(), direction: 'in'})
     }
     onSend = (string, json) => {
-      dispatch({type: 'JET_DEBUG', url, user, password, string, json, timestamp: new Date(), direction: 'out'})
+      dispatch({type: 'JET_DEBUG', url, user, password, headers, string, json, timestamp: new Date(), direction: 'out'})
     }
   }
 
-  return api.connect({url, user, password, onReceive, onSend}, onClose(dispatch, connection)).then(
+  return api.connect({url, user, password, headers, onReceive, onSend}, onClose(dispatch, connection)).then(
     (response) => {
-      dispatch({type: 'JET_CONNECT_SUCCESS', url, user, password})
+      dispatch({type: 'JET_CONNECT_SUCCESS', url, user, password, headers})
     },
     (error) => {
-      dispatch({type: 'JET_CONNECT_FAILURE', url, user, password, error})
+      dispatch({type: 'JET_CONNECT_FAILURE', url, user, password, headers, error})
     })
 }
 
@@ -92,6 +96,7 @@ export const connect = (connection, debug) => (dispatch) => {
  * @property {string} url
  * @property {string} [user]
  * @property {string} [password]
+ * @property {object} [headers] - Custom headers (for alternative authentication)
  */
 
 /**
@@ -105,9 +110,9 @@ export const connect = (connection, debug) => (dispatch) => {
  *   This if you have evidence that server specified with 'connection' died / is unreachable.
  *
  */
-export const close = ({url, user, password}, force = false) => {
-  api.close({url, user, password}, force)
-  return {type: 'JET_CLOSE', url, user, password, force}
+export const close = ({url, user, password, headers}, force = false) => {
+  api.close({url, user, password, headers}, force)
+  return {type: 'JET_CLOSE', url, user, password, headers, force}
 }
 
 /**
@@ -117,6 +122,7 @@ export const close = ({url, user, password}, force = false) => {
  * @property {string} id
  * @property {string} [user]
  * @property {string} [password]
+ * @property {object} [headers] - Custom headers (for alternative authentication)
  */
 
 /**
@@ -129,9 +135,9 @@ export const close = ({url, user, password}, force = false) => {
  * @param {Connection} connection - The connection specification
  * @param {string} id - The user defined id. Must be the same as used in {@link fetch}.
  */
-export const unfetch = ({url, user, password}, id) => {
-  api.unfetch({url, user, password}, id)
-  return {type: 'JET_UNFETCH', url, user, password, id}
+export const unfetch = ({url, user, password, headers}, id) => {
+  api.unfetch({url, user, password, headers}, id)
+  return {type: 'JET_UNFETCH', url, user, password, headers, id}
 }
 
 /**
