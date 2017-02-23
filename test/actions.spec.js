@@ -30,7 +30,8 @@ describe('actions', () => {
             type: 'JET_CONNECT_REQUEST',
             url,
             password: undefined,
-            user: undefined
+            user: undefined,
+            headers: undefined
           })
           ++i
         } else {
@@ -38,7 +39,8 @@ describe('actions', () => {
             type: 'JET_CONNECT_SUCCESS',
             url,
             password: undefined,
-            user: undefined
+            user: undefined,
+            headers: undefined
           })
           done()
         }
@@ -86,7 +88,8 @@ describe('actions', () => {
             type: 'JET_CONNECT_REQUEST',
             url: 'ws://foo.bar:11123',
             password: undefined,
-            user: undefined
+            user: undefined,
+            headers: undefined
           })
           ++i
         } else if (i === 1) {
