@@ -187,14 +187,27 @@ export const unfetch = ({url, user, password, headers}, id) => {
  */
 export const fetch = (connection, expression, id) => (dispatch) => {
   dispatch({type: 'JET_FETCHER_REQUEST', expression, id})
+  let dispatchedSuccess
+  /*
+   * The api.fetch.then() promise does not always resolves before first fetch data:
+   * due to this issue: https://github.com/lipp/node-jet/issues/297.
+   * Therefor this ugly dispatchedSuccess state is neccessary to keep actions in order
+   */
 
   const onData = (...data) => {
+    if (!dispatchedSuccess) {
+      dispatchedSuccess = true
+      dispatch({type: 'JET_FETCHER_SUCCESS', expression, id})
+    }
     dispatch({type: 'JET_FETCHER_DATA', data: data, id, expression})
   }
 
   return api.fetch(connection, expression, id, onData, onClose(dispatch, connection)).then(
     (response) => {
-      dispatch({type: 'JET_FETCHER_SUCCESS', expression, id})
+      if (!dispatchedSuccess) {
+        dispatchedSuccess = true
+        dispatch({type: 'JET_FETCHER_SUCCESS', expression, id})
+      }
     },
     (error) => {
       dispatch({type: 'JET_FETCHER_FAILURE', expression, id, error})
