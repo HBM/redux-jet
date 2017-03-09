@@ -61,7 +61,7 @@ export const close = (connection, force) => {
   const {url, user, password, headers} = connection
   const id = [url, user, password, JSON.stringify(headers)].join('--')
   if (peers[id]) {
-    peers[id].close()
+    const isClosed = peers[id].close()
     if (force) {
       if (pendings[id]) {
         pendings[id].forEach(pending => {
@@ -71,8 +71,12 @@ export const close = (connection, force) => {
       }
       delete onCloseCbs[id]
       delete peers[id]
+      return Promise.resolve()
+    } else {
+      return isClosed
     }
   }
+  return Promise.resolve()
 }
 
 const noop = () => {}

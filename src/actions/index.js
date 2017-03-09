@@ -101,18 +101,21 @@ export const connect = (connection, debug) => (dispatch) => {
 
 /**
  * Close a connection to a Jet Daemon.
+ * A Promise/thunk based action creator.
  *
  * Triggers {@link JET_CLOSE} action.
  *
  * @function close
+ * @return {Promise} Resolves when the connection has been closed
  * @param {Connection} connection - The connection specification
  * @param {Boolean} [force=false] - Force an immediate connection drop. Use
  *   This if you have evidence that server specified with 'connection' died / is unreachable.
  *
  */
-export const close = ({url, user, password, headers}, force = false) => {
-  api.close({url, user, password, headers}, force)
-  return {type: 'JET_CLOSE', url, user, password, headers, force}
+export const close = ({url, user, password, headers}, force = false) => dispatch => {
+  const isClosed = api.close({url, user, password, headers}, force)
+  dispatch({type: 'JET_CLOSE', url, user, password, headers, force})
+  return isClosed
 }
 
 /**

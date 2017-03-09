@@ -4,6 +4,7 @@ import { connect, close, set, call, fetch, unfetch, get, addState, addMethod, re
 import { Daemon, Peer, State, Method } from 'node-jet'
 
 const url = 'ws://localhost:11123'
+const noop = () => {}
 
 describe('actions', () => {
   let daemon
@@ -19,7 +20,7 @@ describe('actions', () => {
 
   describe('connect', () => {
     afterEach(() => {
-      close({url})
+      close({url})(noop)
     })
 
     it('ok', (done) => {
@@ -70,8 +71,7 @@ describe('actions', () => {
     })
 
     it('twice (fast)', done => {
-      const noop = () => {}
-      close({url})
+      close({url})(noop)
       connect({url})(noop)
       connect({url})(action => {
         if (action.type === 'JET_CONNECT_SUCCESS') {
@@ -106,7 +106,7 @@ describe('actions', () => {
   it('connect (wait) -> close', (done) => {
     connect({url})((action) => {
       if (action.type === 'JET_CONNECT_SUCCESS') {
-        close({url})
+        close({url})(noop)
       }
       if (action.type === 'JET_CLOSED') {
         done()
@@ -120,14 +120,14 @@ describe('actions', () => {
         done()
       }
     })
-    close({url})
+    close({url})(noop)
   })
 
   it('connect (wait) -> close(force)', (done) => {
     let unexpectedAction
     connect({url})((action) => {
       if (action.type === 'JET_CONNECT_SUCCESS') {
-        close({url}, true)
+        close({url}, true)(noop)
       }
       if (action.type !== 'JET_CONNECT_SUCCESS' && action.type !== 'JET_CONNECT_REQUEST') {
         unexpectedAction = true
@@ -146,16 +146,18 @@ describe('actions', () => {
         unexpectedAction = true
       }
     })
-    close({url}, true)
+    close({url}, true)(noop)
     setTimeout(() => {
       assert(!unexpectedAction)
       done()
     }, 100)
   })
 
-  it('close', () => {
-    const action = close({url: 'ws://localhost.bar:123'})
-    assert.equal(action.type, 'JET_CLOSE')
+  it('close', (done) => {
+    close({url: 'ws://localhost.bar:123'})(action => {
+      assert.equal(action.type, 'JET_CLOSE')
+      done()
+    })
   })
 
   describe('set', () => {
