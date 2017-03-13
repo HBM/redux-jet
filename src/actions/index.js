@@ -87,6 +87,7 @@ export const connect = (connection, debug) => (dispatch) => {
     },
     (error) => {
       dispatch({type: 'JET_CONNECT_FAILURE', url, user, password, headers, error})
+      throw error
     })
 }
 
