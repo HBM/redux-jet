@@ -99,7 +99,7 @@ describe('actions', () => {
           assert(error)
           done()
         }
-      })
+      }).catch(noop)
     })
   })
 
@@ -119,7 +119,7 @@ describe('actions', () => {
       if (action.type === 'JET_CONNECT_FAILURE') {
         done()
       }
-    })
+    }).catch(noop)
     close({url})(noop)
   })
 
@@ -145,7 +145,7 @@ describe('actions', () => {
       if (action.type !== 'JET_CONNECT_FAILURE' && action.type !== 'JET_CONNECT_REQUEST') {
         unexpectedAction = true
       }
-    })
+    }).catch(noop)
     close({url}, true)(noop)
     setTimeout(() => {
       assert(!unexpectedAction)
