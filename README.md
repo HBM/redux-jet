@@ -1,4 +1,6 @@
 # redux-jet
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/lipp/redux-jet.svg)](https://greenkeeper.io/)
 Redux middleware for [node-jet (Jet - Realtime Message Bus)](https://github.com/lipp/node-jet).
 
 [![Build Status](https://travis-ci.org/lipp/redux-jet.svg?branch=master)](https://travis-ci.org/lipp/redux-jet)
