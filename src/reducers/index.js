@@ -48,8 +48,6 @@ const handleRequestResponse = (action, getElement) => {
           error: action.error
         }
       }
-    default:
-      return
   }
 }
 
@@ -362,4 +360,3 @@ export const requests = (maxLength = 100) => (state = [], action) => {
       return state
   }
 }
-
