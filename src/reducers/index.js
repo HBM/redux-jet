@@ -48,6 +48,7 @@ const handleRequestResponse = (action, getElement) => {
           error: action.error
         }
       }
+    default:
   }
 }
 
