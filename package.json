@@ -28,7 +28,7 @@
     "standard": "^8.0.0"
   },
   "dependencies": {
-    "node-jet": "^1.5.2",
+    "node-jet": "^1.5.3",
     "uuid": "^3.0.1"
   },
   "main": "./lib",

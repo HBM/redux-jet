@@ -49,7 +49,6 @@ const handleRequestResponse = (action, getElement) => {
         }
       }
     default:
-      return
   }
 }
 
@@ -362,4 +361,3 @@ export const requests = (maxLength = 100) => (state = [], action) => {
       return state
   }
 }
-

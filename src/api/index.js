@@ -36,12 +36,13 @@ const ensurePeer = ({url, user, password, headers, onSend, onReceive}, onClose) 
         })
 
       peer.closed().then(() => {
-        if (!pendings[id] && peers[id]) {
+        const peer = peers[id]
+        delete peers[id]
+        if (!pendings[id] && peer) {
           if (onCloseCbs[id]) {
             onCloseCbs[id]()
           }
         }
-        delete peers[id]
       })
     }
 
