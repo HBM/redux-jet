@@ -2,12 +2,12 @@ const handleRequestResponse = (action, getElement) => {
   let element
   switch (action.type) {
     case 'JET_SET_REQUEST':
-    case 'JET_CALL_REQUEST':
+    case 'JET_CALL_REQUEST': {
       element = getElement()
       if (!element) {
         return
       }
-      let request = {
+      const request = {
         pending: true,
         id: action.id
       }
@@ -20,8 +20,9 @@ const handleRequestResponse = (action, getElement) => {
         ...element,
         request
       }
+    }
     case 'JET_SET_SUCCESS':
-    case 'JET_CALL_SUCCESS':
+    case 'JET_CALL_SUCCESS': {
       element = getElement()
       if (!element || !element.request || element.request.id !== action.id) {
         return
@@ -34,8 +35,9 @@ const handleRequestResponse = (action, getElement) => {
           result: action.result
         }
       }
+    }
     case 'JET_SET_FAILURE':
-    case 'JET_CALL_FAILURE':
+    case 'JET_CALL_FAILURE': {
       element = getElement()
       if (!element || !element.request || element.request.id !== action.id) {
         return
@@ -48,6 +50,7 @@ const handleRequestResponse = (action, getElement) => {
           error: action.error
         }
       }
+    }
     default:
   }
 }
@@ -61,26 +64,27 @@ const _sorted = (state = [], action) => {
       return []
     case 'JET_GET_SUCCESS':
       return action.result
-    case 'JET_FETCHER_DATA':
+    case 'JET_FETCHER_DATA': {
       if (!action.expression.sort) {
         console.error(`The fetch expression for id=${action.id} is not defined "sort".`)
         return []
       }
       const changes = action.data[0]
       const length = action.data[1]
-      let newState = state.slice(0, length)
+      const newState = state.slice(0, length)
       const from = action.expression.sort.from
       changes.forEach(change => {
         const prev = state.find(s => s.path === change.path)
         const index = change.index - from
         if (prev && prev.request) {
-          const {request} = prev
-          newState[index] = {...change, request}
+          const { request } = prev
+          newState[index] = { ...change, request }
         } else {
-          newState[index] = {...change}
+          newState[index] = { ...change }
         }
       })
       return newState
+    }
     default:
       return state
   }
@@ -169,18 +173,18 @@ export const array = (id, initialState = []) => (state = initialState, action) =
       return []
     case 'JET_GET_SUCCESS':
       return action.result
-    case 'JET_FETCHER_DATA':
+    case 'JET_FETCHER_DATA': {
       if (action.expression.sort) {
         return _sorted(state, action)
       } else {
-        const {path, event, value, fetchOnly = false} = action.data[0]
+        const { path, event, value, fetchOnly = false } = action.data[0]
         if (event === 'add') {
-          return [...state, {path, value, fetchOnly}]
+          return [...state, { path, value, fetchOnly }]
         } else if (event === 'change') {
           const index = state.findIndex(e => e.path === path)
           return [
             ...state.slice(0, index),
-            {...state[index], path, value},
+            { ...state[index], path, value },
             ...state.slice(index + 1)
           ]
         } else {
@@ -191,6 +195,7 @@ export const array = (id, initialState = []) => (state = initialState, action) =
           ]
         }
       }
+    }
     default:
       return state
   }
@@ -218,7 +223,7 @@ export const array = (id, initialState = []) => (state = initialState, action) =
 export const unsorted = (id, initialState = {}) => (state = initialState, action) => {
   const element = handleRequestResponse(action, () => state[action.path])
   if (element) {
-    return {...state, [action.path]: element}
+    return { ...state, [action.path]: element }
   }
   if (action.type !== 'JET_CLOSE' && action.id !== id) {
     return state
@@ -231,15 +236,16 @@ export const unsorted = (id, initialState = {}) => (state = initialState, action
       return {}
     case 'JET_GET_SUCCESS':
       return action.result
-    case 'JET_FETCHER_DATA':
-      let newState = {...state}
-      const {path, value, event, fetchOnly = false} = action.data[0]
+    case 'JET_FETCHER_DATA': {
+      const newState = { ...state }
+      const { path, value, event, fetchOnly = false } = action.data[0]
       if (event === 'remove') {
         delete newState[path]
       } else {
-        newState[path] = {...newState[path], value, fetchOnly}
+        newState[path] = { ...newState[path], value, fetchOnly }
       }
       return newState
+    }
     default:
       return state
   }
@@ -283,13 +289,14 @@ export const single = (id, initialState = null) => (state = initialState, action
       return null
     case 'JET_GET_SUCCESS':
       return action.result[0] ? action.result[0] : null
-    case 'JET_FETCHER_DATA':
-      const {value, event, fetchOnly = false, path} = action.data[0]
+    case 'JET_FETCHER_DATA': {
+      const { value, event, fetchOnly = false, path } = action.data[0]
       if (event === 'add' || event === 'change') {
-        return {value, fetchOnly, path}
+        return { value, fetchOnly, path }
       } else {
         return null
       }
+    }
     default:
       return state
   }
@@ -307,15 +314,16 @@ export const messages = (maxLength = 1000) => (state = [], action) => {
 export const request = (state, action) => {
   switch (action.type) {
     case 'JET_SET_REQUEST':
-    case 'JET_CALL_REQUEST':
-      const {path, id} = action
+    case 'JET_CALL_REQUEST': {
+      const { path, id } = action
       if (action.type === 'JET_SET_REQUEST') {
-        return {path, value: action.value, id, pending: true}
+        return { path, value: action.value, id, pending: true }
       } else {
-        return {path, args: action.args, id, pending: true}
+        return { path, args: action.args, id, pending: true }
       }
+    }
     case 'JET_SET_SUCCESS':
-    case 'JET_CALL_SUCCESS':
+    case 'JET_CALL_SUCCESS': {
       if (state.id !== action.id) {
         return state
       }
@@ -324,8 +332,9 @@ export const request = (state, action) => {
         result: action.result,
         pending: false
       }
+    }
     case 'JET_SET_FAILURE':
-    case 'JET_CALL_FAILURE':
+    case 'JET_CALL_FAILURE': {
       if (state.id !== action.id) {
         return state
       }
@@ -334,6 +343,7 @@ export const request = (state, action) => {
         error: action.error,
         pending: false
       }
+    }
     default:
       return state
   }
@@ -345,18 +355,20 @@ export const requests = (maxLength = 100) => (state = [], action) => {
     case 'JET_CLOSE':
       return []
     case 'JET_SET_REQUEST':
-    case 'JET_CALL_REQUEST':
+    case 'JET_CALL_REQUEST': {
       return [
         ...state,
         request(undefined, action)
       ].splice(start + 1)
+    }
     case 'JET_SET_SUCCESS':
     case 'JET_CALL_SUCCESS':
     case 'JET_SET_FAILURE':
-    case 'JET_CALL_FAILURE':
+    case 'JET_CALL_FAILURE': {
       return state.map((t) => {
         return request(t, action)
       }).splice(start)
+    }
     default:
       return state
   }

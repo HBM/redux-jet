@@ -12,7 +12,7 @@ describe('reducers', () => {
         id: 'bar'
       }
       const req = request(123, action)
-      assert.equal(req, 123)
+      assert.strictEqual(req, 123)
     })
 
     it('JET_SET_REQUEST', () => {
@@ -23,10 +23,10 @@ describe('reducers', () => {
         id: 'bar'
       }
       const req = request(undefined, action)
-      assert.equal(req.path, 'foo')
-      assert.equal(req.value, 123)
-      assert.equal(req.pending, true)
-      assert.equal(req.id, 'bar')
+      assert.strictEqual(req.path, 'foo')
+      assert.strictEqual(req.value, 123)
+      assert.strictEqual(req.pending, true)
+      assert.strictEqual(req.id, 'bar')
     })
 
     it('JET_CALL_REQUEST', () => {
@@ -37,10 +37,10 @@ describe('reducers', () => {
         id: 'bar'
       }
       const req = request(undefined, action)
-      assert.equal(req.path, 'foo')
-      assert.deepEqual(req.args, [1, 2])
-      assert.equal(req.pending, true)
-      assert.equal(req.id, 'bar')
+      assert.strictEqual(req.path, 'foo')
+      assert.deepStrictEqual(req.args, [1, 2])
+      assert.strictEqual(req.pending, true)
+      assert.strictEqual(req.id, 'bar')
     })
 
     it('JET_SET_SUCCESS', () => {
@@ -55,10 +55,10 @@ describe('reducers', () => {
         id: 'bar'
       }
       const req = request(prev, action)
-      assert.equal(req.path, 'foo')
-      assert.equal(req.value, 123)
-      assert.equal(req.pending, false)
-      assert.equal(req.id, 'bar')
+      assert.strictEqual(req.path, 'foo')
+      assert.strictEqual(req.value, 123)
+      assert.strictEqual(req.pending, false)
+      assert.strictEqual(req.id, 'bar')
     })
 
     it('JET_CALL_SUCCESS', () => {
@@ -74,11 +74,11 @@ describe('reducers', () => {
         result: 123
       }
       const req = request(prev, action)
-      assert.equal(req.path, 'foo')
-      assert.equal(req.result, 123)
-      assert.equal(req.pending, false)
-      assert.equal(req.id, 'bar')
-      assert.deepEqual(req.args, [1, 2])
+      assert.strictEqual(req.path, 'foo')
+      assert.strictEqual(req.result, 123)
+      assert.strictEqual(req.pending, false)
+      assert.strictEqual(req.id, 'bar')
+      assert.deepStrictEqual(req.args, [1, 2])
     })
 
     it('JET_SET_FAILURE', () => {
@@ -94,11 +94,11 @@ describe('reducers', () => {
         id: 'bar'
       }
       const req = request(prev, action)
-      assert.equal(req.path, 'foo')
-      assert.equal(req.value, 123)
-      assert.equal(req.pending, false)
-      assert.equal(req.id, 'bar')
-      assert.equal(req.error, 'arg')
+      assert.strictEqual(req.path, 'foo')
+      assert.strictEqual(req.value, 123)
+      assert.strictEqual(req.pending, false)
+      assert.strictEqual(req.id, 'bar')
+      assert.strictEqual(req.error, 'arg')
     })
 
     it('JET_CALL_FAILURE', () => {
@@ -114,11 +114,11 @@ describe('reducers', () => {
         id: 'bar'
       }
       const req = request(prev, action)
-      assert.equal(req.path, 'foo')
-      assert.deepEqual(req.args, [1, 2])
-      assert.equal(req.pending, false)
-      assert.equal(req.id, 'bar')
-      assert.equal(req.error, 'arg')
+      assert.strictEqual(req.path, 'foo')
+      assert.deepStrictEqual(req.args, [1, 2])
+      assert.strictEqual(req.pending, false)
+      assert.strictEqual(req.id, 'bar')
+      assert.strictEqual(req.error, 'arg')
     })
 
     it('JET_CALL_SUCCESS other id', () => {
@@ -134,7 +134,7 @@ describe('reducers', () => {
         result: 123
       }
       const req = request(prev, action)
-      assert.equal(req, prev)
+      assert.strictEqual(req, prev)
     })
 
     it('JET_CALL_SUCCESS other id', () => {
@@ -150,7 +150,7 @@ describe('reducers', () => {
         result: 123
       }
       const req = request(prev, action)
-      assert.equal(req, prev)
+      assert.strictEqual(req, prev)
     })
 
     it('JET_SET_FAILURE other id', () => {
@@ -166,7 +166,7 @@ describe('reducers', () => {
         id: 'bar2'
       }
       const req = request(prev, action)
-      assert.equal(req, prev)
+      assert.strictEqual(req, prev)
     })
 
     it('JET_CALL_FAILURE other id', () => {
@@ -182,14 +182,14 @@ describe('reducers', () => {
         id: 'bar2'
       }
       const req = request(prev, action)
-      assert.equal(req, prev)
+      assert.strictEqual(req, prev)
     })
   })
 
   describe('requests', () => {
     it('defaults to empty array', () => {
       const req = requests()
-      assert.deepEqual(req(undefined, {}), [])
+      assert.deepStrictEqual(req(undefined, {}), [])
     })
 
     it('JET_CLOSE clears array', () => {
@@ -197,7 +197,7 @@ describe('reducers', () => {
       const state = req([12, 23], {
         type: 'JET_CLOSE'
       })
-      assert.deepEqual(state, [])
+      assert.deepStrictEqual(state, [])
     })
 
     it('push request', () => {
@@ -207,13 +207,13 @@ describe('reducers', () => {
         path: 'foo',
         value: 123
       }
-      const state = req([{foo: 'bar'}], action)
-      assert.equal(state.length, 2)
-      assert.deepEqual(state[0], {foo: 'bar'})
-      const {path, value, pending} = state[1]
-      assert.equal(path, 'foo')
-      assert.equal(value, 123)
-      assert.equal(pending, true)
+      const state = req([{ foo: 'bar' }], action)
+      assert.strictEqual(state.length, 2)
+      assert.deepStrictEqual(state[0], { foo: 'bar' })
+      const { path, value, pending } = state[1]
+      assert.strictEqual(path, 'foo')
+      assert.strictEqual(value, 123)
+      assert.strictEqual(pending, true)
     })
 
     it('push request pops old prev requests', () => {
@@ -223,13 +223,13 @@ describe('reducers', () => {
         path: 'foo',
         value: 123
       }
-      const state = req([{foo: 'bar'}, {bla: 'foo'}], action)
-      assert.equal(state.length, 2)
-      assert.deepEqual(state[0], {bla: 'foo'})
-      const {path, value, pending} = state[1]
-      assert.equal(path, 'foo')
-      assert.equal(value, 123)
-      assert.equal(pending, true)
+      const state = req([{ foo: 'bar' }, { bla: 'foo' }], action)
+      assert.strictEqual(state.length, 2)
+      assert.deepStrictEqual(state[0], { bla: 'foo' })
+      const { path, value, pending } = state[1]
+      assert.strictEqual(path, 'foo')
+      assert.strictEqual(value, 123)
+      assert.strictEqual(pending, true)
     })
 
     it('modifies existing request', () => {
@@ -245,17 +245,17 @@ describe('reducers', () => {
         path: 'foo'
       }]
       const state = req(prev, action)
-      assert.equal(state.length, 1)
-      const {path, value, pending} = state[0]
-      assert.equal(path, 'foo')
-      assert.equal(value, 123)
-      assert.equal(pending, false)
+      assert.strictEqual(state.length, 1)
+      const { path, value, pending } = state[0]
+      assert.strictEqual(path, 'foo')
+      assert.strictEqual(value, 123)
+      assert.strictEqual(pending, false)
     })
   })
 
   describe('sorted', () => {
     it('default is empty array', () => {
-      assert.deepEqual(sorted('foo')(undefined, {}), [])
+      assert.deepStrictEqual(sorted('foo')(undefined, {}), [])
     })
 
     it('JET_CLOSE clears array', () => {
@@ -263,7 +263,7 @@ describe('reducers', () => {
       const state = s([12, 23], {
         type: 'JET_CLOSE'
       })
-      assert.deepEqual(state, [])
+      assert.deepStrictEqual(state, [])
     })
 
     it('returns empty array for JET_FETCHER_FAILURE', () => {
@@ -271,7 +271,7 @@ describe('reducers', () => {
         type: 'JET_FETCHER_FAILURE',
         id: 'foo'
       }
-      assert.deepEqual(sorted('foo')(undefined, action), [])
+      assert.deepStrictEqual(sorted('foo')(undefined, action), [])
     })
 
     it('returns empty array for JET_UNFETCH', () => {
@@ -279,7 +279,7 @@ describe('reducers', () => {
         type: 'JET_UNFETCH',
         id: 'foo'
       }
-      assert.deepEqual(sorted('foo')([{foo: 123}], action), [])
+      assert.deepStrictEqual(sorted('foo')([{ foo: 123 }], action), [])
     })
 
     it('returns empty array for JET_FETCHER_REQUEST', () => {
@@ -287,7 +287,7 @@ describe('reducers', () => {
         type: 'JET_FETCHER_REQUEST',
         id: 'foo'
       }
-      assert.deepEqual(sorted('foo')(undefined, action), [])
+      assert.deepStrictEqual(sorted('foo')(undefined, action), [])
     })
 
     it('returns empty array for JET_FETCHER_DATA with non sorting expression', () => {
@@ -296,13 +296,13 @@ describe('reducers', () => {
         id: 'foo',
         expression: {}
       }
-      assert.deepEqual(sorted('foo')(undefined, action), [])
+      assert.deepStrictEqual(sorted('foo')(undefined, action), [])
     })
 
     it('returns array with data from JET_FETCHER_DATA', () => {
       const action = {
         type: 'JET_FETCHER_DATA',
-        data: [[{path: 'asd', value: 123, index: 1}], 1],
+        data: [[{ path: 'asd', value: 123, index: 1 }], 1],
         id: 'foo',
         expression: {
           sort: {
@@ -310,8 +310,8 @@ describe('reducers', () => {
           }
         }
       }
-      const state = sorted('foo')([{path: 'asd', value: 123, index: 1}], action)
-      assert.deepEqual(state, [{path: 'asd', value: 123, index: 1}])
+      const state = sorted('foo')([{ path: 'asd', value: 123, index: 1 }], action)
+      assert.deepStrictEqual(state, [{ path: 'asd', value: 123, index: 1 }])
     })
 
     it('adds request data with data from JET_SET_REQUEST', () => {
@@ -321,7 +321,7 @@ describe('reducers', () => {
         value: 3334,
         id: 3
       }
-      const state = sorted('foo')([{path: 'asd', value: 123, index: 1}], action)
+      const state = sorted('foo')([{ path: 'asd', value: 123, index: 1 }], action)
       const expected = {
         path: 'asd',
         value: 123,
@@ -332,7 +332,7 @@ describe('reducers', () => {
           id: 3
         }
       }
-      assert.deepEqual(state, [expected])
+      assert.deepStrictEqual(state, [expected])
     })
 
     it('returns unmodified state if JET_SET_REQUEST path does not match', () => {
@@ -348,7 +348,7 @@ describe('reducers', () => {
         index: 1
       }
       const state = sorted('foo')([initial], action)
-      assert.deepEqual(state, [initial])
+      assert.deepStrictEqual(state, [initial])
     })
 
     it('JET_SET_REQUEST overwrites old request', () => {
@@ -379,7 +379,7 @@ describe('reducers', () => {
         }
       }
       const state = sorted('foo')([initial], action)
-      assert.deepEqual(state, [expected])
+      assert.deepStrictEqual(state, [expected])
     })
 
     it('JET_SET_SUCCESS sets result', () => {
@@ -412,7 +412,7 @@ describe('reducers', () => {
         }
       }
       const state = sorted('foo')([initial], action)
-      assert.deepEqual(state, [expected])
+      assert.deepStrictEqual(state, [expected])
     })
 
     it('JET_SET_FAILURE sets result', () => {
@@ -445,7 +445,7 @@ describe('reducers', () => {
         }
       }
       const state = sorted('foo')([initial], action)
-      assert.deepEqual(state, [expected])
+      assert.deepStrictEqual(state, [expected])
     })
 
     it('JET_GET_SUCCESS sets result', () => {
@@ -453,10 +453,10 @@ describe('reducers', () => {
         type: 'JET_GET_SUCCESS',
         expression: 'foo',
         id: 'bar',
-        result: [{path: 'hello', value: 'world'}]
+        result: [{ path: 'hello', value: 'world' }]
       }
       const state = sorted('bar')([], action)
-      assert.deepEqual(state, [{
+      assert.deepStrictEqual(state, [{
         path: 'hello',
         value: 'world'
       }])
@@ -468,13 +468,13 @@ describe('reducers', () => {
         id: 'foo'
       }
       const state = sorted('foo')([4, 2], action)
-      assert.deepEqual(state, [4, 2])
+      assert.deepStrictEqual(state, [4, 2])
     })
   })
 
   describe('array', () => {
     it('default is empty array', () => {
-      assert.deepEqual(array('foo')(undefined, {}), [])
+      assert.deepStrictEqual(array('foo')(undefined, {}), [])
     })
 
     it('JET_CLOSE clears array', () => {
@@ -482,7 +482,7 @@ describe('reducers', () => {
       const state = a([12, 23], {
         type: 'JET_CLOSE'
       })
-      assert.deepEqual(state, [])
+      assert.deepStrictEqual(state, [])
     })
 
     it('returns empty array for JET_FETCHER_FAILURE', () => {
@@ -490,7 +490,7 @@ describe('reducers', () => {
         type: 'JET_FETCHER_FAILURE',
         id: 'foo'
       }
-      assert.deepEqual(array('foo')(undefined, action), [])
+      assert.deepStrictEqual(array('foo')(undefined, action), [])
     })
 
     it('returns empty array for JET_UNFETCH', () => {
@@ -498,7 +498,7 @@ describe('reducers', () => {
         type: 'JET_UNFETCH',
         id: 'foo'
       }
-      assert.deepEqual(array('foo')([{foo: 123}], action), [])
+      assert.deepStrictEqual(array('foo')([{ foo: 123 }], action), [])
     })
 
     it('returns empty array for JET_FETCHER_REQUEST', () => {
@@ -506,7 +506,7 @@ describe('reducers', () => {
         type: 'JET_FETCHER_REQUEST',
         id: 'foo'
       }
-      assert.deepEqual(array('foo')(undefined, action), [])
+      assert.deepStrictEqual(array('foo')(undefined, action), [])
     })
 
     it('adds request data with data from JET_SET_REQUEST', () => {
@@ -516,7 +516,7 @@ describe('reducers', () => {
         value: 3334,
         id: 3
       }
-      const state = array('foo')([{path: 'asd', value: 123, index: 1}], action)
+      const state = array('foo')([{ path: 'asd', value: 123, index: 1 }], action)
       const expected = {
         path: 'asd',
         value: 123,
@@ -527,13 +527,13 @@ describe('reducers', () => {
           id: 3
         }
       }
-      assert.deepEqual(state, [expected])
+      assert.deepStrictEqual(state, [expected])
     })
 
     it('returns array with data from JET_FETCHER_DATA (data is sorted) new element', () => {
       const action = {
         type: 'JET_FETCHER_DATA',
-        data: [[{path: 'asd', value: 22, index: 3}], 1],
+        data: [[{ path: 'asd', value: 22, index: 3 }], 1],
         id: 'foo',
         expression: {
           sort: {
@@ -544,15 +544,15 @@ describe('reducers', () => {
       const prevState = []
       const state = array('foo')(prevState, action)
       const expected = [
-        {path: 'asd', value: 22, index: 3}
+        { path: 'asd', value: 22, index: 3 }
       ]
-      assert.deepEqual(state, expected)
+      assert.deepStrictEqual(state, expected)
     })
 
     it('returns array with data from JET_FETCHER_DATA (data is sorted) change position', () => {
       const action = {
         type: 'JET_FETCHER_DATA',
-        data: [[{path: 'asd', value: 22, index: 3}], 1],
+        data: [[{ path: 'asd', value: 22, index: 3 }], 1],
         id: 'foo',
         expression: {
           sort: {
@@ -561,25 +561,25 @@ describe('reducers', () => {
         }
       }
       const prevState = [
-        {path: 'foo', value: 123, index: 3},
-        {path: 'asd', value: 2, index: 4, request: 10}
+        { path: 'foo', value: 123, index: 3 },
+        { path: 'asd', value: 2, index: 4, request: 10 }
       ]
       const state = array('foo')(prevState, action)
       const expected = [
-        {path: 'asd', value: 22, index: 3, request: 10}
+        { path: 'asd', value: 22, index: 3, request: 10 }
       ]
-      assert.deepEqual(state, expected)
+      assert.deepStrictEqual(state, expected)
     })
 
     it('returns array with data from JET_FETCHER_DATA (data is unsorted / "add" event)', () => {
       const action = {
         type: 'JET_FETCHER_DATA',
-        data: [{path: 'foo', event: 'add', value: 123}],
+        data: [{ path: 'foo', event: 'add', value: 123 }],
         id: 'foo',
         expression: {}
       }
-      const state = array('foo')([{path: 'bar', value: 444}], action)
-      assert.deepEqual(state, [
+      const state = array('foo')([{ path: 'bar', value: 444 }], action)
+      assert.deepStrictEqual(state, [
         {
           path: 'bar',
           value: 444
@@ -595,12 +595,12 @@ describe('reducers', () => {
     it('returns array with data from JET_FETCHER_DATA (data is unsorted / "change" event)', () => {
       const action = {
         type: 'JET_FETCHER_DATA',
-        data: [{path: 'foo', event: 'change', value: 123}],
+        data: [{ path: 'foo', event: 'change', value: 123 }],
         id: 'foo',
         expression: {}
       }
-      const state = array('foo')([{path: 'foo', value: 444}], action)
-      assert.deepEqual(state, [
+      const state = array('foo')([{ path: 'foo', value: 444 }], action)
+      assert.deepStrictEqual(state, [
         {
           path: 'foo',
           value: 123
@@ -611,12 +611,12 @@ describe('reducers', () => {
     it('returns array with data from JET_FETCHER_DATA (data is unsorted / "remove" event)', () => {
       const action = {
         type: 'JET_FETCHER_DATA',
-        data: [{path: 'foo', event: 'remove'}],
+        data: [{ path: 'foo', event: 'remove' }],
         id: 'foo',
         expression: {}
       }
-      const state = array('foo')([{path: 'foo', value: 444}], action)
-      assert.deepEqual(state, [])
+      const state = array('foo')([{ path: 'foo', value: 444 }], action)
+      assert.deepStrictEqual(state, [])
     })
 
     it('JET_GET_SUCCESS sets result', () => {
@@ -624,10 +624,10 @@ describe('reducers', () => {
         type: 'JET_GET_SUCCESS',
         expression: 'foo',
         id: 'bar',
-        result: [{path: 'hello', value: 'world'}]
+        result: [{ path: 'hello', value: 'world' }]
       }
       const state = array('bar')([], action)
-      assert.deepEqual(state, [{
+      assert.deepStrictEqual(state, [{
         path: 'hello',
         value: 'world'
       }])
@@ -639,21 +639,21 @@ describe('reducers', () => {
         id: 'foo'
       }
       const state = array('foo')([4, 2], action)
-      assert.deepEqual(state, [4, 2])
+      assert.deepStrictEqual(state, [4, 2])
     })
   })
 
   describe('unsorted', () => {
     it('default is empty object', () => {
-      assert.deepEqual(unsorted('foo')(undefined, {}), {})
+      assert.deepStrictEqual(unsorted('foo')(undefined, {}), {})
     })
 
     it('JET_CLOSE clears object', () => {
       const u = unsorted('foo')
-      const state = u({x: 123}, {
+      const state = u({ x: 123 }, {
         type: 'JET_CLOSE'
       })
-      assert.deepEqual(state, {})
+      assert.deepStrictEqual(state, {})
     })
 
     it('returns empty object for JET_FETCHER_FAILURE', () => {
@@ -661,7 +661,7 @@ describe('reducers', () => {
         type: 'JET_FETCHER_FAILURE',
         id: 'foo'
       }
-      assert.deepEqual(unsorted('foo')(undefined, action), {})
+      assert.deepStrictEqual(unsorted('foo')(undefined, action), {})
     })
 
     it('returns empty object for JET_UNFETCH', () => {
@@ -669,7 +669,7 @@ describe('reducers', () => {
         type: 'JET_UNFETCH',
         id: 'foo'
       }
-      assert.deepEqual(unsorted('foo')({foo: 123}, action), {})
+      assert.deepStrictEqual(unsorted('foo')({ foo: 123 }, action), {})
     })
 
     it('returns empty object for JET_FETCHER_REQUEST', () => {
@@ -677,7 +677,7 @@ describe('reducers', () => {
         type: 'JET_FETCHER_REQUEST',
         id: 'foo'
       }
-      assert.deepEqual(unsorted('foo')(undefined, action), {})
+      assert.deepStrictEqual(unsorted('foo')(undefined, action), {})
     })
 
     it('adds request data with data from JET_SET_REQUEST', () => {
@@ -687,7 +687,7 @@ describe('reducers', () => {
         value: 3334,
         id: 3
       }
-      const state = unsorted('foo')({asd: {value: 123}}, action)
+      const state = unsorted('foo')({ asd: { value: 123 } }, action)
       const expected = {
         asd: {
           value: 123,
@@ -698,7 +698,7 @@ describe('reducers', () => {
           }
         }
       }
-      assert.deepEqual(state, expected)
+      assert.deepStrictEqual(state, expected)
     })
 
     it('returns object with data from JET_FETCHER_DATA / add event', () => {
@@ -713,7 +713,7 @@ describe('reducers', () => {
         id: 'foo'
       }
       const state = unsorted('foo')(undefined, action)
-      assert.deepEqual(state, {bla: {value: 123, fetchOnly: true}})
+      assert.deepStrictEqual(state, { bla: { value: 123, fetchOnly: true } })
     })
 
     it('returns object with data from JET_FETCHER_DATA / change event', () => {
@@ -726,8 +726,8 @@ describe('reducers', () => {
         }],
         id: 'foo'
       }
-      const state = unsorted('foo')({bla: {value: 333}}, action)
-      assert.deepEqual(state, {bla: {value: 123, fetchOnly: false}})
+      const state = unsorted('foo')({ bla: { value: 333 } }, action)
+      assert.deepStrictEqual(state, { bla: { value: 123, fetchOnly: false } })
     })
 
     it('returns object with data from JET_FETCHER_DATA / remove event', () => {
@@ -740,8 +740,8 @@ describe('reducers', () => {
         }],
         id: 'foo'
       }
-      const state = unsorted('foo')({bla: {value: 123}}, action)
-      assert.deepEqual(state, {})
+      const state = unsorted('foo')({ bla: { value: 123 } }, action)
+      assert.deepStrictEqual(state, {})
     })
 
     it('JET_GET_SUCCESS sets result', () => {
@@ -749,10 +749,10 @@ describe('reducers', () => {
         type: 'JET_GET_SUCCESS',
         expression: 'foo',
         id: 'bar',
-        result: [{path: 'hello', value: 'world'}]
+        result: [{ path: 'hello', value: 'world' }]
       }
       const state = unsorted('bar')([], action)
-      assert.deepEqual(state, [{
+      assert.deepStrictEqual(state, [{
         path: 'hello',
         value: 'world'
       }])
@@ -763,14 +763,14 @@ describe('reducers', () => {
         type: 'JET_NOT_YET_IMPLEMENTED',
         id: 'foo'
       }
-      const state = unsorted('foo')({foo: 123}, action)
-      assert.deepEqual(state, {foo: 123})
+      const state = unsorted('foo')({ foo: 123 }, action)
+      assert.deepStrictEqual(state, { foo: 123 })
     })
   })
 
   describe('messages', () => {
     it('default is []', () => {
-      assert.deepEqual(messages(3)(undefined, {}), [])
+      assert.deepStrictEqual(messages(3)(undefined, {}), [])
     })
 
     it('prepends JET_DEBUG actions', () => {
@@ -784,7 +784,7 @@ describe('reducers', () => {
       }
       const reducer = messages(3)
       const state = reducer(reducer(undefined, action1), action2)
-      assert.deepEqual(state, [action2, action1])
+      assert.deepStrictEqual(state, [action2, action1])
     })
 
     it('maxLength defaults to 1000', () => {
@@ -792,12 +792,12 @@ describe('reducers', () => {
       let state
       const reducer = messages()
       for (i = 0; i < 1000; ++i) {
-        state = reducer(state, {type: 'JET_DEBUG'})
+        state = reducer(state, { type: 'JET_DEBUG' })
         assert(state.length <= 1000)
       }
-      assert.equal(state.length, 1000)
-      state = reducer(state, {type: 'JET_DEBUG'})
-      assert.equal(state.length, 1000)
+      assert.strictEqual(state.length, 1000)
+      state = reducer(state, { type: 'JET_DEBUG' })
+      assert.strictEqual(state.length, 1000)
     })
 
     it('discards old JET_DEBUG actions', () => {
@@ -815,21 +815,21 @@ describe('reducers', () => {
       }
       const reducer = messages(2)
       const state = reducer(reducer(reducer(undefined, action1), action2), action3)
-      assert.deepEqual(state, [action3, action2])
+      assert.deepStrictEqual(state, [action3, action2])
     })
   })
 
   describe('single', () => {
     it('default is null', () => {
-      assert.equal(single('foo')(undefined, {}), null)
+      assert.strictEqual(single('foo')(undefined, {}), null)
     })
 
     it('JET_CLOSE clears state', () => {
       const s = single('foo')
-      const state = s({x: 123}, {
+      const state = s({ x: 123 }, {
         type: 'JET_CLOSE'
       })
-      assert.deepEqual(state, null)
+      assert.deepStrictEqual(state, null)
     })
 
     it('returns null for JET_FETCHER_FAILURE', () => {
@@ -837,7 +837,7 @@ describe('reducers', () => {
         type: 'JET_FETCHER_FAILURE',
         id: 'foo'
       }
-      assert.equal(single('foo')(undefined, action), null)
+      assert.strictEqual(single('foo')(undefined, action), null)
     })
 
     it('returns null for JET_UNFETCH', () => {
@@ -845,7 +845,7 @@ describe('reducers', () => {
         type: 'JET_UNFETCH',
         id: 'foo'
       }
-      assert.equal(single('foo')({foo: 123}, action), null)
+      assert.strictEqual(single('foo')({ foo: 123 }, action), null)
     })
 
     it('returns null for JET_FETCHER_REQUEST', () => {
@@ -853,7 +853,7 @@ describe('reducers', () => {
         type: 'JET_FETCHER_REQUEST',
         id: 'foo'
       }
-      assert.equal(single('foo')(undefined, action), null)
+      assert.strictEqual(single('foo')(undefined, action), null)
     })
 
     it('returns object with data.value from JET_FETCHER_DATA / add event', () => {
@@ -867,7 +867,7 @@ describe('reducers', () => {
         id: 'foo'
       }
       const state = single('foo')(undefined, action)
-      assert.deepEqual(state, {value: 123, fetchOnly: false, path: 'bla'})
+      assert.deepStrictEqual(state, { value: 123, fetchOnly: false, path: 'bla' })
     })
 
     it('returns object with data.value from JET_FETCHER_DATA / change event', () => {
@@ -881,7 +881,7 @@ describe('reducers', () => {
         id: 'foo'
       }
       const state = single('foo')(undefined, action)
-      assert.deepEqual(state, {value: 123, path: 'bla', fetchOnly: false})
+      assert.deepStrictEqual(state, { value: 123, path: 'bla', fetchOnly: false })
     })
 
     it('returns null from JET_FETCHER_DATA / remove event', () => {
@@ -895,7 +895,7 @@ describe('reducers', () => {
         id: 'foo'
       }
       const state = single('foo')(undefined, action)
-      assert.equal(state, null)
+      assert.strictEqual(state, null)
     })
 
     it('adds request entry for JET_CALL_REQUEST action', () => {
@@ -910,7 +910,7 @@ describe('reducers', () => {
         fetchOnly: true
       }
       const state = single('foo')(initial, action)
-      assert.deepEqual(state, {
+      assert.deepStrictEqual(state, {
         ...initial,
         request: {
           pending: true,
@@ -925,10 +925,10 @@ describe('reducers', () => {
         type: 'JET_GET_SUCCESS',
         expression: 'foo',
         id: 'bar',
-        result: [{path: 'hello', value: 'world'}]
+        result: [{ path: 'hello', value: 'world' }]
       }
       const state = single('bar')([], action)
-      assert.equal(state.value, 'world')
+      assert.strictEqual(state.value, 'world')
     })
 
     it('returns unmodified state if same id but unknown action.type', () => {
@@ -937,7 +937,7 @@ describe('reducers', () => {
         id: 'foo'
       }
       const state = single('foo')(123, action)
-      assert.equal(state, 123)
+      assert.strictEqual(state, 123)
     })
   })
 })
