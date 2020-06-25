@@ -1,17 +1,17 @@
 import { Peer, Fetcher, State, Method } from 'node-jet'
 
-let peers = {}
-let pendings = {}
-let fetchers = {}
-let elements = {}
-let onCloseCbs = {}
+const peers = {}
+const pendings = {}
+const fetchers = {}
+const elements = {}
+const onCloseCbs = {}
 
-const ensurePeer = ({url, user, password, headers, onSend, onReceive}, onClose) => {
+const ensurePeer = ({ url, user, password, headers, onSend, onReceive }, onClose) => {
   return new Promise((resolve, reject) => {
     const id = [url, user, password, JSON.stringify(headers)].join('--')
     if (!peers[id]) {
       pendings[id] = []
-      const peer = new Peer({url, user, password, headers, onSend, onReceive})
+      const peer = new Peer({ url, user, password, headers, onSend, onReceive })
       peers[id] = peer
       onCloseCbs[id] = () => {
         delete onCloseCbs[id]
@@ -47,7 +47,7 @@ const ensurePeer = ({url, user, password, headers, onSend, onReceive}, onClose) 
     }
 
     if (pendings[id]) {
-      pendings[id].push({resolve, reject})
+      pendings[id].push({ resolve, reject })
     } else {
       resolve(peers[id])
     }
@@ -59,7 +59,7 @@ export const connect = (connection, onClose) => {
 }
 
 export const close = (connection, force) => {
-  const {url, user, password, headers} = connection
+  const { url, user, password, headers } = connection
   const id = [url, user, password, JSON.stringify(headers)].join('--')
   if (peers[id]) {
     const isClosed = peers[id].close()
@@ -83,9 +83,9 @@ export const close = (connection, force) => {
 const noop = () => {}
 
 export const unfetch = (connection, id) => {
-  const {url, user, password, headers} = connection
+  const { url, user, password, headers } = connection
   const fid = [url, user, password, JSON.stringify(headers), id].join('--')
-  let fetcher = fetchers[fid]
+  const fetcher = fetchers[fid]
   if (fetcher) {
     fetcher.unfetch().catch(noop)
   }
@@ -95,7 +95,7 @@ export const unfetch = (connection, id) => {
 export const fetch = (connection, expression, id, onStatesDidChange, onClose) => {
   return ensurePeer(connection, onClose)
     .then((peer) => {
-      const {url, user, password, headers} = connection
+      const { url, user, password, headers } = connection
       const fid = [url, user, password, JSON.stringify(headers), id].join('--')
       let fetcher = fetchers[fid]
       if (fetcher) {

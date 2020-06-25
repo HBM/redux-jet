@@ -20,14 +20,14 @@ describe('actions', () => {
 
   describe('connect', () => {
     afterEach(() => {
-      close({url})(noop)
+      close({ url })(noop)
     })
 
     it('ok', (done) => {
       let i = 0
-      connect({url})((action) => {
+      connect({ url })((action) => {
         if (i === 0) {
-          assert.deepEqual(action, {
+          assert.deepStrictEqual(action, {
             type: 'JET_CONNECT_REQUEST',
             url,
             password: undefined,
@@ -36,7 +36,7 @@ describe('actions', () => {
           })
           ++i
         } else {
-          assert.deepEqual(action, {
+          assert.deepStrictEqual(action, {
             type: 'JET_CONNECT_SUCCESS',
             url,
             password: undefined,
@@ -50,30 +50,30 @@ describe('actions', () => {
 
     it('with debug', (done) => {
       let i = 0
-      connect({url}, true)((action) => {
+      connect({ url }, true)((action) => {
         if (action.type !== 'JET_DEBUG') {
           return
         }
         if (i === 0) {
-          assert.equal(action.direction, 'out')
-          assert.equal(typeof action.string, 'string')
+          assert.strictEqual(action.direction, 'out')
+          assert.strictEqual(typeof action.string, 'string')
           assert.doesNotThrow(() => new Date(action.timestamp))
-          assert.equal(typeof action.json, 'object')
+          assert.strictEqual(typeof action.json, 'object')
           ++i
         } else if (i === 1) {
-          assert.equal(action.direction, 'in')
-          assert.equal(typeof action.string, 'string')
+          assert.strictEqual(action.direction, 'in')
+          assert.strictEqual(typeof action.string, 'string')
           assert.doesNotThrow(() => new Date(action.timestamp))
-          assert.equal(typeof action.json, 'object')
+          assert.strictEqual(typeof action.json, 'object')
           done()
         }
       })
     })
 
     it('twice (fast)', done => {
-      close({url})(noop)
-      connect({url})(noop)
-      connect({url})(action => {
+      close({ url })(noop)
+      connect({ url })(noop)
+      connect({ url })(action => {
         if (action.type === 'JET_CONNECT_SUCCESS') {
           done()
         }
@@ -82,9 +82,9 @@ describe('actions', () => {
 
     it('fail', (done) => {
       let i = 0
-      connect({url: 'ws://foo.bar:11123'})((action) => {
+      connect({ url: 'ws://foo.bar:11123' })((action) => {
         if (i === 0) {
-          assert.deepEqual(action, {
+          assert.deepStrictEqual(action, {
             type: 'JET_CONNECT_REQUEST',
             url: 'ws://foo.bar:11123',
             password: undefined,
@@ -93,9 +93,9 @@ describe('actions', () => {
           })
           ++i
         } else if (i === 1) {
-          const {type, url, error} = action
-          assert.equal(type, 'JET_CONNECT_FAILURE')
-          assert.equal(url, 'ws://foo.bar:11123')
+          const { type, url, error } = action
+          assert.strictEqual(type, 'JET_CONNECT_FAILURE')
+          assert.strictEqual(url, 'ws://foo.bar:11123')
           assert(error)
           done()
         }
@@ -104,9 +104,9 @@ describe('actions', () => {
   })
 
   it('connect (wait) -> close', (done) => {
-    connect({url})((action) => {
+    connect({ url })((action) => {
       if (action.type === 'JET_CONNECT_SUCCESS') {
-        close({url})(noop)
+        close({ url })(noop)
       }
       if (action.type === 'JET_CLOSED') {
         done()
@@ -115,19 +115,19 @@ describe('actions', () => {
   })
 
   it('connect -> close', (done) => {
-    connect({url})((action) => {
+    connect({ url })((action) => {
       if (action.type === 'JET_CONNECT_FAILURE') {
         done()
       }
     }).catch(noop)
-    close({url})(noop)
+    close({ url })(noop)
   })
 
   it('connect (wait) -> close(force)', (done) => {
     let unexpectedAction
-    connect({url})((action) => {
+    connect({ url })((action) => {
       if (action.type === 'JET_CONNECT_SUCCESS') {
-        close({url}, true)(noop)
+        close({ url }, true)(noop)
       }
       if (action.type !== 'JET_CONNECT_SUCCESS' && action.type !== 'JET_CONNECT_REQUEST') {
         unexpectedAction = true
@@ -141,12 +141,12 @@ describe('actions', () => {
 
   it('connect -> close(force)', (done) => {
     let unexpectedAction
-    connect({url})((action) => {
+    connect({ url })((action) => {
       if (action.type !== 'JET_CONNECT_FAILURE' && action.type !== 'JET_CONNECT_REQUEST') {
         unexpectedAction = true
       }
     }).catch(noop)
-    close({url}, true)(noop)
+    close({ url }, true)(noop)
     setTimeout(() => {
       assert(!unexpectedAction)
       done()
@@ -154,8 +154,8 @@ describe('actions', () => {
   })
 
   it('close', (done) => {
-    close({url: 'ws://localhost.bar:123'})(action => {
-      assert.equal(action.type, 'JET_CLOSE')
+    close({ url: 'ws://localhost.bar:123' })(action => {
+      assert.strictEqual(action.type, 'JET_CLOSE')
       done()
     })
   })
@@ -179,21 +179,21 @@ describe('actions', () => {
         newVal = val
       }
 
-      set({url}, 'abc', 123)((action) => {
+      set({ url }, 'abc', 123)((action) => {
         if (i === 0) {
-          const {path, value, id, type} = action
-          assert.equal(type, 'JET_SET_REQUEST')
-          assert.equal(path, 'abc')
-          assert.equal(value, 123)
+          const { path, value, id, type } = action
+          assert.strictEqual(type, 'JET_SET_REQUEST')
+          assert.strictEqual(path, 'abc')
+          assert.strictEqual(value, 123)
           assert(id)
           ++i
         } else {
-          const {path, value, id, type} = action
-          assert.equal(type, 'JET_SET_SUCCESS')
-          assert.equal(path, 'abc')
-          assert.equal(value, 123)
+          const { path, value, id, type } = action
+          assert.strictEqual(type, 'JET_SET_SUCCESS')
+          assert.strictEqual(path, 'abc')
+          assert.strictEqual(value, 123)
           assert(id)
-          assert.equal(newVal, 123)
+          assert.strictEqual(newVal, 123)
           done()
         }
       })
@@ -201,18 +201,18 @@ describe('actions', () => {
 
     it('fail', (done) => {
       let i = 0
-      set({url}, 'abc2', 123)((action) => {
+      set({ url }, 'abc2', 123)((action) => {
         if (i === 0) {
-          const {path, value, id, type} = action
-          assert.equal(type, 'JET_SET_REQUEST')
-          assert.equal(path, 'abc2')
-          assert.equal(value, 123)
+          const { path, value, id, type } = action
+          assert.strictEqual(type, 'JET_SET_REQUEST')
+          assert.strictEqual(path, 'abc2')
+          assert.strictEqual(value, 123)
           assert(id)
           ++i
         } else {
-          const {path, id, type, error} = action
-          assert.equal(type, 'JET_SET_FAILURE')
-          assert.equal(path, 'abc2')
+          const { path, id, type, error } = action
+          assert.strictEqual(type, 'JET_SET_FAILURE')
+          assert.strictEqual(path, 'abc2')
           assert(error)
           assert(id)
           done()
@@ -241,21 +241,21 @@ describe('actions', () => {
         return args[0] + args[1]
       }
 
-      call({url}, 'def', [1, 2])((action) => {
+      call({ url }, 'def', [1, 2])((action) => {
         if (i === 0) {
-          const {path, args, id, type} = action
-          assert.equal(type, 'JET_CALL_REQUEST')
-          assert.equal(path, 'def')
-          assert.deepEqual(args, [1, 2])
+          const { path, args, id, type } = action
+          assert.strictEqual(type, 'JET_CALL_REQUEST')
+          assert.strictEqual(path, 'def')
+          assert.deepStrictEqual(args, [1, 2])
           assert(id)
           ++i
         } else {
-          const {path, result, id, type} = action
-          assert.equal(type, 'JET_CALL_SUCCESS')
-          assert.equal(path, 'def')
-          assert.equal(result, 3)
+          const { path, result, id, type } = action
+          assert.strictEqual(type, 'JET_CALL_SUCCESS')
+          assert.strictEqual(path, 'def')
+          assert.strictEqual(result, 3)
           assert(id)
-          assert.deepEqual(args, [1, 2])
+          assert.deepStrictEqual(args, [1, 2])
           done()
         }
       })
@@ -263,18 +263,18 @@ describe('actions', () => {
 
     it('fail', (done) => {
       let i = 0
-      call({url}, 'abc2', [1, 2])((action) => {
+      call({ url }, 'abc2', [1, 2])((action) => {
         if (i === 0) {
-          const {path, args, id, type} = action
-          assert.equal(type, 'JET_CALL_REQUEST')
-          assert.equal(path, 'abc2')
-          assert.deepEqual(args, [1, 2])
+          const { path, args, id, type } = action
+          assert.strictEqual(type, 'JET_CALL_REQUEST')
+          assert.strictEqual(path, 'abc2')
+          assert.deepStrictEqual(args, [1, 2])
           assert(id)
           ++i
         } else {
-          const {path, id, type, error} = action
-          assert.equal(type, 'JET_CALL_FAILURE')
-          assert.equal(path, 'abc2')
+          const { path, id, type, error } = action
+          assert.strictEqual(type, 'JET_CALL_FAILURE')
+          assert.strictEqual(path, 'abc2')
           assert(error)
           assert(id)
           done()
@@ -298,20 +298,20 @@ describe('actions', () => {
           equals: 'yyy'
         }
       }
-      get({url}, fexpression, 'someid')((action) => {
+      get({ url }, fexpression, 'someid')((action) => {
         if (i === 0) {
-          const {expression, id, type} = action
-          assert.equal(type, 'JET_GET_REQUEST')
-          assert.deepEqual(expression, fexpression)
-          assert.equal(id, 'someid')
+          const { expression, id, type } = action
+          assert.strictEqual(type, 'JET_GET_REQUEST')
+          assert.deepStrictEqual(expression, fexpression)
+          assert.strictEqual(id, 'someid')
           ++i
         } else {
-          assert.equal(action.type, 'JET_GET_SUCCESS')
-          assert.deepEqual(action.expression.path, fexpression.path)
-          assert.equal(action.result[0].event, 'add')
-          assert.equal(action.result[0].path, 'yyy')
-          assert.equal(action.result[0].value, 444)
-          assert.equal(action.id, 'someid')
+          assert.strictEqual(action.type, 'JET_GET_SUCCESS')
+          assert.deepStrictEqual(action.expression.path, fexpression.path)
+          assert.strictEqual(action.result[0].event, 'add')
+          assert.strictEqual(action.result[0].path, 'yyy')
+          assert.strictEqual(action.result[0].value, 444)
+          assert.strictEqual(action.id, 'someid')
           done()
         }
       })
@@ -320,16 +320,16 @@ describe('actions', () => {
     it('fail', (done) => {
       let i = 0
       const fexpression = 123
-      get({url}, fexpression, 'someid')((action) => {
+      get({ url }, fexpression, 'someid')((action) => {
         if (i === 0) {
-          const {expression, id, type} = action
-          assert.equal(type, 'JET_GET_REQUEST')
-          assert.deepEqual(expression, fexpression)
-          assert.equal(id, 'someid')
+          const { expression, id, type } = action
+          assert.strictEqual(type, 'JET_GET_REQUEST')
+          assert.deepStrictEqual(expression, fexpression)
+          assert.strictEqual(id, 'someid')
           ++i
         } else {
-          assert.equal(action.type, 'JET_GET_FAILURE')
-          assert.deepEqual(action.expression, fexpression)
+          assert.strictEqual(action.type, 'JET_GET_FAILURE')
+          assert.deepStrictEqual(action.expression, fexpression)
           assert(action.error)
           done()
         }
@@ -352,27 +352,27 @@ describe('actions', () => {
           equals: 'ppp'
         }
       }
-      fetch({url}, fexpression, 'someid')((action) => {
+      fetch({ url }, fexpression, 'someid')((action) => {
         if (i === 0) {
-          const {expression, id, type} = action
-          assert.equal(type, 'JET_FETCHER_REQUEST')
-          assert.deepEqual(expression, fexpression)
-          assert.equal(id, 'someid')
+          const { expression, id, type } = action
+          assert.strictEqual(type, 'JET_FETCHER_REQUEST')
+          assert.deepStrictEqual(expression, fexpression)
+          assert.strictEqual(id, 'someid')
           ++i
         } else if (i === 1) {
-          const {expression, id, type} = action
-          assert.equal(type, 'JET_FETCHER_SUCCESS')
-          assert.deepEqual(expression, fexpression)
-          assert.equal(id, 'someid')
+          const { expression, id, type } = action
+          assert.strictEqual(type, 'JET_FETCHER_SUCCESS')
+          assert.deepStrictEqual(expression, fexpression)
+          assert.strictEqual(id, 'someid')
           ++i
         } else {
-          assert.equal(action.type, 'JET_FETCHER_DATA')
-          assert.deepEqual(action.expression.path, fexpression.path)
-          assert.equal(action.data[0].event, 'add')
-          assert.equal(action.data[0].path, 'ppp')
-          assert.equal(action.data[0].value, 444)
-          assert.equal(action.id, 'someid')
-          unfetch({url}, 'someid')
+          assert.strictEqual(action.type, 'JET_FETCHER_DATA')
+          assert.deepStrictEqual(action.expression.path, fexpression.path)
+          assert.strictEqual(action.data[0].event, 'add')
+          assert.strictEqual(action.data[0].path, 'ppp')
+          assert.strictEqual(action.data[0].value, 444)
+          assert.strictEqual(action.id, 'someid')
+          unfetch({ url }, 'someid')
           done()
         }
       })
@@ -385,28 +385,28 @@ describe('actions', () => {
           equals: 'ppp'
         }
       }
-      fetch({url}, {path: {equals: '33'}}, 'someid')(() => {})
-      fetch({url}, fexpression, 'someid')((action) => {
+      fetch({ url }, { path: { equals: '33' } }, 'someid')(() => {})
+      fetch({ url }, fexpression, 'someid')((action) => {
         if (i === 0) {
-          const {expression, id, type} = action
-          assert.equal(type, 'JET_FETCHER_REQUEST')
-          assert.deepEqual(expression, fexpression)
-          assert.equal(id, 'someid')
+          const { expression, id, type } = action
+          assert.strictEqual(type, 'JET_FETCHER_REQUEST')
+          assert.deepStrictEqual(expression, fexpression)
+          assert.strictEqual(id, 'someid')
           ++i
         } else if (i === 1) {
-          const {expression, id, type} = action
-          assert.equal(type, 'JET_FETCHER_SUCCESS')
-          assert.deepEqual(expression, fexpression)
-          assert.equal(id, 'someid')
+          const { expression, id, type } = action
+          assert.strictEqual(type, 'JET_FETCHER_SUCCESS')
+          assert.deepStrictEqual(expression, fexpression)
+          assert.strictEqual(id, 'someid')
           ++i
         } else {
-          assert.equal(action.type, 'JET_FETCHER_DATA')
-          assert.deepEqual(action.expression.path, fexpression.path)
-          assert.equal(action.data[0].event, 'add')
-          assert.equal(action.data[0].path, 'ppp')
-          assert.equal(action.data[0].value, 444)
-          assert.equal(action.id, 'someid')
-          unfetch({url}, 'someid')
+          assert.strictEqual(action.type, 'JET_FETCHER_DATA')
+          assert.deepStrictEqual(action.expression.path, fexpression.path)
+          assert.strictEqual(action.data[0].event, 'add')
+          assert.strictEqual(action.data[0].path, 'ppp')
+          assert.strictEqual(action.data[0].value, 444)
+          assert.strictEqual(action.id, 'someid')
+          unfetch({ url }, 'someid')
           done()
         }
       })
@@ -414,20 +414,20 @@ describe('actions', () => {
 
     it('fail', (done) => {
       let i = 0
-      fetch({url}, 1, 'someid')((action) => {
+      fetch({ url }, 1, 'someid')((action) => {
         if (i === 0) {
-          const {expression, id, type} = action
-          assert.equal(type, 'JET_FETCHER_REQUEST')
-          assert.equal(expression, 1)
-          assert.equal(id, 'someid')
+          const { expression, id, type } = action
+          assert.strictEqual(type, 'JET_FETCHER_REQUEST')
+          assert.strictEqual(expression, 1)
+          assert.strictEqual(id, 'someid')
           ++i
         } else if (i === 1) {
-          const {expression, id, type, error} = action
-          assert.equal(type, 'JET_FETCHER_FAILURE')
-          assert.equal(expression, 1)
-          assert.equal(id, 'someid')
+          const { expression, id, type, error } = action
+          assert.strictEqual(type, 'JET_FETCHER_FAILURE')
+          assert.strictEqual(expression, 1)
+          assert.strictEqual(id, 'someid')
           assert(error)
-          unfetch({url}, 'someid')
+          unfetch({ url }, 'someid')
           done()
         }
       })
@@ -447,15 +447,15 @@ describe('actions', () => {
       }
       const s2 = new State('ppp2', 3)
       peer.add(s2).then(() => {
-        fetch({url}, expression, 'someid')((action) => {
+        fetch({ url }, expression, 'someid')((action) => {
           if (i === 0) {
-            assert.equal(action.type, 'JET_FETCHER_REQUEST')
+            assert.strictEqual(action.type, 'JET_FETCHER_REQUEST')
             ++i
           } else if (i === 1) {
-            assert.equal(action.type, 'JET_FETCHER_SUCCESS')
+            assert.strictEqual(action.type, 'JET_FETCHER_SUCCESS')
             ++i
           } else if (i === 2) {
-            assert.equal(action.type, 'JET_FETCHER_DATA')
+            assert.strictEqual(action.type, 'JET_FETCHER_DATA')
             const expected = [
               [
                 { path: 'ppp', value: 444, fetchOnly: true, index: 1 },
@@ -463,19 +463,19 @@ describe('actions', () => {
               ],
               2
             ]
-            assert.deepEqual(action.data, expected)
+            assert.deepStrictEqual(action.data, expected)
             s2.value(6666)
             ++i
           } else if (i === 3) {
-            assert.equal(action.type, 'JET_FETCHER_DATA')
+            assert.strictEqual(action.type, 'JET_FETCHER_DATA')
             const expected = [
               [
                 { path: 'ppp2', value: 6666, fetchOnly: true, index: 2 }
               ],
               2
             ]
-            assert.deepEqual(action.data, expected)
-            unfetch({url}, 'someid')
+            assert.deepStrictEqual(action.data, expected)
+            unfetch({ url }, 'someid')
             s2.remove().then(() => {
               done()
             })
@@ -486,36 +486,36 @@ describe('actions', () => {
   })
 
   it('fetch -> unfetch', (done) => {
-    fetch({url}, {path: {equals: '33'}}, 'someid')((action) => {
+    fetch({ url }, { path: { equals: '33' } }, 'someid')((action) => {
       if (action.type === 'JET_FETCHER_SUCCESS') {
-        const action = unfetch({url}, 'someid')
-        assert.equal(action.url, url)
-        assert.equal(action.type, 'JET_UNFETCH')
-        assert.equal(action.id, 'someid')
+        const action = unfetch({ url }, 'someid')
+        assert.strictEqual(action.url, url)
+        assert.strictEqual(action.type, 'JET_UNFETCH')
+        assert.strictEqual(action.id, 'someid')
         done()
       }
     })
   })
 
   it('unfetch', () => {
-    const action = unfetch({url}, 'someid')
-    assert.equal(action.url, url)
-    assert.equal(action.type, 'JET_UNFETCH')
-    assert.equal(action.id, 'someid')
+    const action = unfetch({ url }, 'someid')
+    assert.strictEqual(action.url, url)
+    assert.strictEqual(action.type, 'JET_UNFETCH')
+    assert.strictEqual(action.id, 'someid')
   })
 
   describe('addMethod', () => {
     it('ok', done => {
       let i = 0
-      addMethod({url}, 'foo/bar/method', () => {})((action) => {
+      addMethod({ url }, 'foo/bar/method', () => {})((action) => {
         if (i === 0) {
-          assert.equal(action.type, 'JET_ADD_REQUEST')
-          assert.equal(action.path, 'foo/bar/method')
-          assert.equal(action.kind, 'method')
+          assert.strictEqual(action.type, 'JET_ADD_REQUEST')
+          assert.strictEqual(action.path, 'foo/bar/method')
+          assert.strictEqual(action.kind, 'method')
         } else if (i === 1) {
-          assert.equal(action.type, 'JET_ADD_SUCCESS')
-          assert.equal(action.path, 'foo/bar/method')
-          assert.equal(action.kind, 'method')
+          assert.strictEqual(action.type, 'JET_ADD_SUCCESS')
+          assert.strictEqual(action.path, 'foo/bar/method')
+          assert.strictEqual(action.kind, 'method')
           done()
         }
         ++i
@@ -526,15 +526,15 @@ describe('actions', () => {
   describe('addState', () => {
     it('ok', done => {
       let i = 0
-      addState({url}, 'foo/bar/state', 123, () => {})((action) => {
+      addState({ url }, 'foo/bar/state', 123, () => {})((action) => {
         if (i === 0) {
-          assert.equal(action.type, 'JET_ADD_REQUEST')
-          assert.equal(action.path, 'foo/bar/state')
-          assert.equal(action.kind, 'state')
+          assert.strictEqual(action.type, 'JET_ADD_REQUEST')
+          assert.strictEqual(action.path, 'foo/bar/state')
+          assert.strictEqual(action.kind, 'state')
         } else if (i === 1) {
-          assert.equal(action.type, 'JET_ADD_SUCCESS')
-          assert.equal(action.path, 'foo/bar/state')
-          assert.equal(action.kind, 'state')
+          assert.strictEqual(action.type, 'JET_ADD_SUCCESS')
+          assert.strictEqual(action.path, 'foo/bar/state')
+          assert.strictEqual(action.kind, 'state')
           done()
         }
         ++i
@@ -543,15 +543,15 @@ describe('actions', () => {
 
     it('propagates error', done => {
       let i = 0
-      addState({url}, 'foo/bar/state2', 123, () => {})(() => {})
-      addState({url}, 'foo/bar/state2', 123, () => {})((action) => {
+      addState({ url }, 'foo/bar/state2', 123, () => {})(() => {})
+      addState({ url }, 'foo/bar/state2', 123, () => {})((action) => {
         if (i === 0) {
-          assert.equal(action.type, 'JET_ADD_REQUEST')
-          assert.equal(action.path, 'foo/bar/state2')
-          assert.equal(action.kind, 'state')
+          assert.strictEqual(action.type, 'JET_ADD_REQUEST')
+          assert.strictEqual(action.path, 'foo/bar/state2')
+          assert.strictEqual(action.kind, 'state')
         } else if (i === 1) {
-          assert.equal(action.type, 'JET_ADD_FAILURE')
-          assert.equal(action.path, 'foo/bar/state2')
+          assert.strictEqual(action.type, 'JET_ADD_FAILURE')
+          assert.strictEqual(action.path, 'foo/bar/state2')
           assert(action.error)
           done()
         }
@@ -562,7 +562,7 @@ describe('actions', () => {
 
   describe('remove', () => {
     before(done => {
-      addMethod({url}, 'foo/bar/removethis', () => {})(action => {
+      addMethod({ url }, 'foo/bar/removethis', () => {})(action => {
         if (action.type === 'JET_ADD_SUCCESS') {
           done()
         }
@@ -571,13 +571,13 @@ describe('actions', () => {
 
     it('works', done => {
       let i = 0
-      remove({url}, 'foo/bar/removethis')(action => {
+      remove({ url }, 'foo/bar/removethis')(action => {
         if (i === 0) {
-          assert.equal(action.type, 'JET_REMOVE_REQUEST')
-          assert.equal(action.path, 'foo/bar/removethis')
+          assert.strictEqual(action.type, 'JET_REMOVE_REQUEST')
+          assert.strictEqual(action.path, 'foo/bar/removethis')
         } else if (i === 1) {
-          assert.equal(action.type, 'JET_REMOVE_SUCCESS')
-          assert.equal(action.path, 'foo/bar/removethis')
+          assert.strictEqual(action.type, 'JET_REMOVE_SUCCESS')
+          assert.strictEqual(action.path, 'foo/bar/removethis')
           done()
         }
         ++i
@@ -586,13 +586,13 @@ describe('actions', () => {
 
     it('propagates error', done => {
       let i = 0
-      remove({url}, 'foo/bar/notthere')(action => {
+      remove({ url }, 'foo/bar/notthere')(action => {
         if (i === 0) {
-          assert.equal(action.type, 'JET_REMOVE_REQUEST')
-          assert.equal(action.path, 'foo/bar/notthere')
+          assert.strictEqual(action.type, 'JET_REMOVE_REQUEST')
+          assert.strictEqual(action.path, 'foo/bar/notthere')
         } else if (i === 1) {
-          assert.equal(action.type, 'JET_REMOVE_FAILURE')
-          assert.equal(action.path, 'foo/bar/notthere')
+          assert.strictEqual(action.type, 'JET_REMOVE_FAILURE')
+          assert.strictEqual(action.path, 'foo/bar/notthere')
           assert(action.error)
           done()
         }
@@ -603,7 +603,7 @@ describe('actions', () => {
 
   describe('change', () => {
     before(done => {
-      addState({url}, 'foo/bar/changer', 33)(action => {
+      addState({ url }, 'foo/bar/changer', 33)(action => {
         if (action.type === 'JET_ADD_SUCCESS') {
           done()
         }
@@ -612,13 +612,13 @@ describe('actions', () => {
 
     it('works', done => {
       let i = 0
-      change({url}, 'foo/bar/changer')(action => {
+      change({ url }, 'foo/bar/changer')(action => {
         if (i === 0) {
-          assert.equal(action.type, 'JET_CHANGE_REQUEST')
-          assert.equal(action.path, 'foo/bar/changer')
+          assert.strictEqual(action.type, 'JET_CHANGE_REQUEST')
+          assert.strictEqual(action.path, 'foo/bar/changer')
         } else if (i === 1) {
-          assert.equal(action.type, 'JET_CHANGE_SUCCESS')
-          assert.equal(action.path, 'foo/bar/changer')
+          assert.strictEqual(action.type, 'JET_CHANGE_SUCCESS')
+          assert.strictEqual(action.path, 'foo/bar/changer')
           done()
         }
         ++i
@@ -627,13 +627,13 @@ describe('actions', () => {
 
     it('propagates error', done => {
       let i = 0
-      change({url}, 'foo/bar/notthere')(action => {
+      change({ url }, 'foo/bar/notthere')(action => {
         if (i === 0) {
-          assert.equal(action.type, 'JET_CHANGE_REQUEST')
-          assert.equal(action.path, 'foo/bar/notthere')
+          assert.strictEqual(action.type, 'JET_CHANGE_REQUEST')
+          assert.strictEqual(action.path, 'foo/bar/notthere')
         } else if (i === 1) {
-          assert.equal(action.type, 'JET_CHANGE_FAILURE')
-          assert.equal(action.path, 'foo/bar/notthere')
+          assert.strictEqual(action.type, 'JET_CHANGE_FAILURE')
+          assert.strictEqual(action.path, 'foo/bar/notthere')
           assert(action.error)
           done()
         }

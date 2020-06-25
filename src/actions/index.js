@@ -1,5 +1,5 @@
 import * as api from '../api'
-import uuid from 'uuid'
+import { v1 as uuidv1 } from 'uuid'
 
 /**
  * A connection is identified by the url, user and password.
@@ -50,7 +50,7 @@ import uuid from 'uuid'
  * @property {object} [headers] - Custom headers (for alternative authentication)
  */
 
-const onClose = (dispatch, connection) => () => dispatch({type: 'JET_CLOSED', ...connection})
+const onClose = (dispatch, connection) => () => dispatch({ type: 'JET_CLOSED', ...connection })
 
 /**
  * Explicitly connect to a Jet Daemon.
@@ -68,25 +68,25 @@ const onClose = (dispatch, connection) => () => dispatch({type: 'JET_CLOSED', ..
  */
 
 export const connect = (connection, debug) => (dispatch) => {
-  const {url, user, password, headers} = connection
-  dispatch({type: 'JET_CONNECT_REQUEST', url, user, password, headers})
+  const { url, user, password, headers } = connection
+  dispatch({ type: 'JET_CONNECT_REQUEST', url, user, password, headers })
   let onReceive
   let onSend
   if (debug) {
     onReceive = (string, json) => {
-      dispatch({type: 'JET_DEBUG', url, user, password, headers, string, json, timestamp: new Date(), direction: 'in'})
+      dispatch({ type: 'JET_DEBUG', url, user, password, headers, string, json, timestamp: new Date(), direction: 'in' })
     }
     onSend = (string, json) => {
-      dispatch({type: 'JET_DEBUG', url, user, password, headers, string, json, timestamp: new Date(), direction: 'out'})
+      dispatch({ type: 'JET_DEBUG', url, user, password, headers, string, json, timestamp: new Date(), direction: 'out' })
     }
   }
 
-  return api.connect({url, user, password, headers, onReceive, onSend}, onClose(dispatch, connection)).then(
+  return api.connect({ url, user, password, headers, onReceive, onSend }, onClose(dispatch, connection)).then(
     (response) => {
-      dispatch({type: 'JET_CONNECT_SUCCESS', url, user, password, headers})
+      dispatch({ type: 'JET_CONNECT_SUCCESS', url, user, password, headers })
     },
     (error) => {
-      dispatch({type: 'JET_CONNECT_FAILURE', url, user, password, headers, error})
+      dispatch({ type: 'JET_CONNECT_FAILURE', url, user, password, headers, error })
       throw error
     })
 }
@@ -113,9 +113,9 @@ export const connect = (connection, debug) => (dispatch) => {
  *   This if you have evidence that server specified with 'connection' died / is unreachable.
  *
  */
-export const close = ({url, user, password, headers}, force = false) => dispatch => {
-  const isClosed = api.close({url, user, password, headers}, force)
-  dispatch({type: 'JET_CLOSE', url, user, password, headers, force})
+export const close = ({ url, user, password, headers }, force = false) => dispatch => {
+  const isClosed = api.close({ url, user, password, headers }, force)
+  dispatch({ type: 'JET_CLOSE', url, user, password, headers, force })
   return isClosed
 }
 
@@ -139,9 +139,9 @@ export const close = ({url, user, password, headers}, force = false) => dispatch
  * @param {Connection} connection - The connection specification
  * @param {string} id - The user defined id. Must be the same as used in {@link fetch}.
  */
-export const unfetch = ({url, user, password, headers}, id) => {
-  api.unfetch({url, user, password, headers}, id)
-  return {type: 'JET_UNFETCH', url, user, password, headers, id}
+export const unfetch = ({ url, user, password, headers }, id) => {
+  api.unfetch({ url, user, password, headers }, id)
+  return { type: 'JET_UNFETCH', url, user, password, headers, id }
 }
 
 /**
@@ -190,7 +190,7 @@ export const unfetch = ({url, user, password, headers}, id) => {
  * @see {@link https://github.com/lipp/node-jet/blob/master/doc/peer.markdown#fetcherexpressionexpr---fetcher Fetch Docu}
  */
 export const fetch = (connection, expression, id) => (dispatch) => {
-  dispatch({type: 'JET_FETCHER_REQUEST', expression, id})
+  dispatch({ type: 'JET_FETCHER_REQUEST', expression, id })
   let dispatchedSuccess
   /*
    * The api.fetch.then() promise does not always resolves before first fetch data:
@@ -201,20 +201,20 @@ export const fetch = (connection, expression, id) => (dispatch) => {
   const onData = (...data) => {
     if (!dispatchedSuccess) {
       dispatchedSuccess = true
-      dispatch({type: 'JET_FETCHER_SUCCESS', expression, id})
+      dispatch({ type: 'JET_FETCHER_SUCCESS', expression, id })
     }
-    dispatch({type: 'JET_FETCHER_DATA', data: data, id, expression})
+    dispatch({ type: 'JET_FETCHER_DATA', data: data, id, expression })
   }
 
   return api.fetch(connection, expression, id, onData, onClose(dispatch, connection)).then(
     (response) => {
       if (!dispatchedSuccess) {
         dispatchedSuccess = true
-        dispatch({type: 'JET_FETCHER_SUCCESS', expression, id})
+        dispatch({ type: 'JET_FETCHER_SUCCESS', expression, id })
       }
     },
     (error) => {
-      dispatch({type: 'JET_FETCHER_FAILURE', expression, id, error})
+      dispatch({ type: 'JET_FETCHER_FAILURE', expression, id, error })
     })
 }
 
@@ -256,15 +256,15 @@ export const fetch = (connection, expression, id) => (dispatch) => {
  *
  */
 export const set = (connection, path, value) => (dispatch) => {
-  const id = uuid.v1()
-  dispatch({type: 'JET_SET_REQUEST', path, value, id})
+  const id = uuidv1()
+  dispatch({ type: 'JET_SET_REQUEST', path, value, id })
 
   return api.set(connection, path, value, onClose(dispatch, connection)).then(
     () => {
-      dispatch({type: 'JET_SET_SUCCESS', path, value, id})
+      dispatch({ type: 'JET_SET_SUCCESS', path, value, id })
     },
     (error) => {
-      dispatch({type: 'JET_SET_FAILURE', path, error, id})
+      dispatch({ type: 'JET_SET_FAILURE', path, error, id })
     })
 }
 
@@ -308,15 +308,15 @@ export const set = (connection, path, value) => (dispatch) => {
  *
  */
 export const call = (connection, path, args) => (dispatch) => {
-  const id = uuid.v1()
-  dispatch({type: 'JET_CALL_REQUEST', path, args, id})
+  const id = uuidv1()
+  dispatch({ type: 'JET_CALL_REQUEST', path, args, id })
 
   return api.call(connection, path, args, onClose(dispatch, connection)).then(
     (result) => {
-      dispatch({type: 'JET_CALL_SUCCESS', path, args, result, id})
+      dispatch({ type: 'JET_CALL_SUCCESS', path, args, result, id })
     },
     (error) => {
-      dispatch({type: 'JET_CALL_FAILURE', path, args, error, id})
+      dispatch({ type: 'JET_CALL_FAILURE', path, args, error, id })
     })
 }
 
@@ -360,27 +360,27 @@ export const call = (connection, path, args) => (dispatch) => {
  *
  */
 export const get = (connection, expression, id) => (dispatch) => {
-  dispatch({type: 'JET_GET_REQUEST', expression, id})
+  dispatch({ type: 'JET_GET_REQUEST', expression, id })
 
   return api.get(connection, expression, onClose(dispatch, connection)).then(
     (result) => {
-      dispatch({type: 'JET_GET_SUCCESS', expression, id, result})
+      dispatch({ type: 'JET_GET_SUCCESS', expression, id, result })
     },
     (error) => {
-      dispatch({type: 'JET_GET_FAILURE', expression, error, id})
+      dispatch({ type: 'JET_GET_FAILURE', expression, error, id })
     })
 }
 
 export const add = (connection, path, ...args) => (dispatch) => {
   const kind = typeof args[0] !== 'function' ? 'state' : 'method'
-  dispatch({type: 'JET_ADD_REQUEST', path, kind})
+  dispatch({ type: 'JET_ADD_REQUEST', path, kind })
 
   return api.add(connection, path, args, onClose(dispatch, connection)).then(
     () => {
-      dispatch({type: 'JET_ADD_SUCCESS', path, kind})
+      dispatch({ type: 'JET_ADD_SUCCESS', path, kind })
     },
     (error) => {
-      dispatch({type: 'JET_ADD_FAILURE', path, error})
+      dispatch({ type: 'JET_ADD_FAILURE', path, error })
     }
   )
 }
@@ -439,14 +439,14 @@ export const addMethod = (connection, path, onCall) => {
  * @param {String} path - The unique path of the state or method to remove
  */
 export const remove = (connection, path) => (dispatch) => {
-  dispatch({type: 'JET_REMOVE_REQUEST', path})
+  dispatch({ type: 'JET_REMOVE_REQUEST', path })
 
   return api.remove(connection, path).then(
     () => {
-      dispatch({type: 'JET_REMOVE_SUCCESS', path})
+      dispatch({ type: 'JET_REMOVE_SUCCESS', path })
     },
     (error) => {
-      dispatch({type: 'JET_REMOVE_FAILURE', path, error})
+      dispatch({ type: 'JET_REMOVE_FAILURE', path, error })
     }
   )
 }
@@ -461,14 +461,14 @@ export const remove = (connection, path) => (dispatch) => {
  * @param {*} newValue - The state's new Value
  */
 export const change = (connection, path, value) => (dispatch) => {
-  dispatch({type: 'JET_CHANGE_REQUEST', path, value})
+  dispatch({ type: 'JET_CHANGE_REQUEST', path, value })
 
   return api.change(connection, path, value).then(
     () => {
-      dispatch({type: 'JET_CHANGE_SUCCESS', path})
+      dispatch({ type: 'JET_CHANGE_SUCCESS', path })
     },
     (error) => {
-      dispatch({type: 'JET_CHANGE_FAILURE', path, error})
+      dispatch({ type: 'JET_CHANGE_FAILURE', path, error })
     }
   )
 }
