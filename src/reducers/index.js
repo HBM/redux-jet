@@ -69,20 +69,40 @@ const _sorted = (state = [], action) => {
         console.error(`The fetch expression for id=${action.id} is not defined "sort".`)
         return []
       }
+      let newState
       const changes = action.data[0]
       const length = action.data[1]
-      const newState = state.slice(0, length)
-      const from = action.expression.sort.from
-      changes.forEach(change => {
-        const prev = state.find(s => s.path === change.path)
-        const index = change.index - from
-        if (prev && prev.request) {
-          const { request } = prev
-          newState[index] = { ...change, request }
+      if(length === 1 && changes[0].type === 'single') {
+        newState = state.map((s, index) => ({ ...s, index }))
+        const data = changes[0]
+        const prev = state.find(s => s.path === data.path)
+        const index = state.findIndex(s => s.path === data.path)
+        if(index !== -1) {
+          if (prev && prev.request) {
+            const { request } = prev
+            newState[index] = { ...change, request }
+          } else {
+            newState[index] = { ...change }
+          }
         } else {
-          newState[index] = { ...change }
+          data.index = newState.length
+          data.value = data.value || ''
+          newState.push(data)
         }
-      })
+      } else {
+        newState = state.slice(0, length)
+        const from = action.expression.sort.from
+        changes.forEach(change => {
+          const prev = state.find(s => s.path === change.path)
+          const index = change.index - from
+          if (prev && prev.request) {
+            const { request } = prev
+            newState[index] = { ...change, request }
+          } else {
+            newState[index] = { ...change }
+          }
+        })
+      }
       return newState
     }
     default:
